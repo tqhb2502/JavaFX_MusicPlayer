@@ -11,8 +11,7 @@ public class MusicPlayer extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
             
-            ///
-            ///
+            /// huy cmt
 		
 		Parent view = FXMLLoader.load(getClass().getResource("/resource/view/Main.fxml"));
 
