@@ -12,6 +12,7 @@ public class MusicPlayer extends Application {
 	public void start(Stage stage) throws Exception {
             
             /// huy cmt
+			// huy tiep tuc cmt
 		
 		Parent view = FXMLLoader.load(getClass().getResource("/resource/view/Main.fxml"));
 
