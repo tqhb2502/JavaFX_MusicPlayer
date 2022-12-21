@@ -14,6 +14,7 @@ public class MusicPlayer extends Application {
             /// huy cmt
 			// huy tiep tuc cmt
 			// cmt thu 3 cua huy
+                        // thai cmtaa
 		
 		Parent view = FXMLLoader.load(getClass().getResource("/resource/view/Main.fxml"));
 
