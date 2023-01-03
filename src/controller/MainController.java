@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
+import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -44,14 +45,11 @@ public class MainController implements Initializable {
     private double collapsedHeight = 0;
 	private double searchExpanded = 180;
 	private double searchCollapsed = 0;
+	
 	private CountDownLatch viewLoadedLatch; // use to synchronize threads
 	private Stage volumePopup;
     private Stage searchPopup;
     private VolumePopupController volumePopupController;
-        
-    private String source;
-    private Player player;
-    private boolean playing = false;    // check if the player is playing
 	
 	/**
 	 * FXML nodes
@@ -110,29 +108,60 @@ public class MainController implements Initializable {
 	 */
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
-            
-		Path fileName = Path.of("src/resource/music.txt");
-
-		// Now calling Files.readString() method to
-		// read the file
-		String song = null;
-		try {
-			song = Files.readString(fileName);
-		} catch (IOException ex) {
-			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		source = "src/resource/song/"+song;
-		player = new Player(source);
+        
+		// play music
+//		Path fileName = Path.of("src/resource/music.txt");
+//
+//		String song = null;
+//		try {
+//			song = Files.readString(fileName);
+//		} catch (IOException ex) {
+//			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+//		}
+//		source = "src/resource/song/"+song;
+//		player = new Player(source);
 		
+		// prepare latch
 		resetViewLoadedLatch();
 		
-		controlBox.getChildren().remove(2); // remove pause button
+		// remove pause button
+		controlBox.getChildren().remove(2);
 		
 		// make frontSliderTrack move along timeSlider
 		frontSliderTrack.prefWidthProperty().bind(timeSlider.widthProperty().multiply(timeSlider.valueProperty().divide(timeSlider.maxProperty())));
 		
-		// prepare popups
+		// popups
 		createVolumePopup();
+		createSearchPopup();
+		
+		// loop & shuffle
+		PseudoClass active = PseudoClass.getPseudoClass("active");
+		
+		loopButton.setOnMouseClicked(event -> {
+			
+			sideBar.requestFocus();
+			MusicPlayer.toggleLoop();
+			loopButton.pseudoClassStateChanged(active, MusicPlayer.isLoopActive());
+		});
+		shuffleButton.setOnMouseClicked(event -> {
+			
+			sideBar.requestFocus();
+			MusicPlayer.toggleShuffle();
+			shuffleButton.pseudoClassStateChanged(active, MusicPlayer.isShuffleActive());
+		});
+		
+		// time slider
+		timeSlider.setFocusTraversable(false);
+		
+		timeSlider.valueChangingProperty().addListener((slider, wasChanging, isChanging) -> {
+			
+			if (wasChanging) {
+				
+				int seconds = (int) Math.round(timeSlider.getValue() / 4.0);
+				timeSlider.setValue(seconds * 4);
+				MusicPlayer.seek(seconds);
+			}
+		});
 	}
 	
 	private void resetViewLoadedLatch() {
@@ -178,7 +207,7 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Volume popup
+	 * Popups
 	 */
 	private void createVolumePopup() {
 		try {
@@ -209,6 +238,67 @@ public class MainController implements Initializable {
 		}
 	}
 	
+	private void createSearchPopup() {
+		try {
+			
+			Stage stage = MusicPlayer.getStage();
+			
+			VBox view = new VBox();
+			view.getStylesheets().add(Resources.CSS + "MainStyle.css");
+			view.getStyleClass().add("searchPopup");
+			
+			Stage popup = new Stage();
+			popup.setScene(new Scene(view));
+			popup.initStyle(StageStyle.UNDECORATED);
+			popup.initOwner(stage);
+			
+			popup.show();
+			popup.hide();
+			searchPopup = popup;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void updateNowPlayingButton() {
+		
+	}
+	
+	public void initializeTimeSlider() {
+		
+	}
+	
+	public void updateTimeSlider() {
+		
+	}
+	
+	public boolean isTimeSliderPressed() {
+		return timeSlider.isPressed();
+	}
+	
+	public void initializeTimeLabels() {
+		
+	}
+	
+	public void updateTimeLabels() {
+		
+	}
+	
+	/**
+	 * Change between play icon and pause icon
+	 * @param isPlaying: true -> pause icon, false -> play icon 
+	 */
+	public void updatePlayPauseIcon(boolean isPlaying) {
+		
+		controlBox.getChildren().remove(1);
+		
+		if (isPlaying) {
+			controlBox.getChildren().add(1, pauseButton);
+		} else {
+			controlBox.getChildren().add(1, playButton);
+		}
+	}
+	
 	@FXML
 	private void selectView(Event e) {
 	}
@@ -223,20 +313,18 @@ public class MainController implements Initializable {
 
 	@FXML
 	private void back(Event e) {
-		player.restart();
-		playing = false;
 	}
 
 	@FXML
 	private void playPause(Event e) {
-		if(playing == false) {
-			player.play();
-			playing = true;
-		}
-		else {
-			player.pause();
-			playing = false;
-		}
+		
+		sideBar.requestFocus();
+    	
+        if (MusicPlayer.isPlaying()) {
+            MusicPlayer.pause();
+        } else {
+            MusicPlayer.play();
+        }
 	}
 
 	@FXML
@@ -324,4 +412,27 @@ public class MainController implements Initializable {
             volumePopup.setOpacity(1.0 - frac);
         }
     };
+	
+	private Animation searchShowAnimation = new Transition() {
+		{
+			setCycleDuration(Duration.millis(250));
+            setInterpolator(Interpolator.EASE_BOTH);
+		}
+		@Override
+		protected void interpolate(double frac) {
+			searchPopup.setOpacity(frac);
+		}
+	};
+		
+	private Animation searchHideAnimation = new Transition() {
+		{
+			setCycleDuration(Duration.millis(250));
+            setInterpolator(Interpolator.EASE_BOTH);
+			setOnFinished(x -> searchPopup.hide());
+		}
+		@Override
+		protected void interpolate(double frac) {
+			searchPopup.setOpacity(1.0 - frac);
+		}
+	};
 }

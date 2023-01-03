@@ -1,5 +1,5 @@
-
 package model;
+
 import java.nio.file.Paths;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -8,30 +8,27 @@ import javafx.util.Duration;
 public class Player {
         
     private Media media;
-    private MediaPlayer media_player;
-    public Player(String source) {
-        media = new Media(Paths.get(source).toUri().toString());
-        media_player = new MediaPlayer(media);
-
+    private MediaPlayer mediaPlayer;
+	
+    public Player(String path) {
+        media = new Media(Paths.get(path).toUri().toString());
+        mediaPlayer = new MediaPlayer(media);
+		mediaPlayer.setVolume(0.5);
     }
-    
-//    public void setPath(String source) {
-//        
-//        media = new Media(Paths.get(source).toUri().toString());
-//        media_player = new MediaPlayer(media);
-//    }
 
     public void play() {
-
-        media_player.play();
-        
+        mediaPlayer.play();
     }
 
     public void pause(){
-        media_player.pause();
+        mediaPlayer.pause();
     }
 
     public void restart() {
-        media_player.seek(Duration.ZERO);
+        mediaPlayer.seek(Duration.ZERO);
     }
+	
+	public void seek(int seconds) {
+		mediaPlayer.seek(new Duration(seconds * 1000));
+	}
 }
