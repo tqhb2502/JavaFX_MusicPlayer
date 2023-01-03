@@ -14,7 +14,10 @@ import javafx.animation.Interpolator;
 import javafx.animation.Transition;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
@@ -26,7 +29,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import main.MusicPlayer;
+import util.Resources;
 
 public class MainController implements Initializable {
 	
@@ -38,10 +45,14 @@ public class MainController implements Initializable {
 	private double searchExpanded = 180;
 	private double searchCollapsed = 0;
 	private CountDownLatch viewLoadedLatch; // use to synchronize threads
+	private Stage volumePopup;
+    private Stage searchPopup;
+    private VolumePopupController volumePopupController;
         
-        private String source;
+    private String source;
     private Player player;
     private boolean playing = false;    // check if the player is playing
+	
 	/**
 	 * FXML nodes
 	 */
@@ -100,23 +111,18 @@ public class MainController implements Initializable {
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
             
-                Path fileName = Path.of("src/resource/music.txt");
- 
-            // Now calling Files.readString() method to
-            // read the file
-            String song = null;
-            try {
-                song = Files.readString(fileName);
-            } catch (IOException ex) {
-                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            source = "src/resource/song/"+song;
-                
-            
-            
-            
-            
-            player = new Player(source);
+		Path fileName = Path.of("src/resource/music.txt");
+
+		// Now calling Files.readString() method to
+		// read the file
+		String song = null;
+		try {
+			song = Files.readString(fileName);
+		} catch (IOException ex) {
+			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		source = "src/resource/song/"+song;
+		player = new Player(source);
 		
 		resetViewLoadedLatch();
 		
@@ -124,8 +130,9 @@ public class MainController implements Initializable {
 		
 		// make frontSliderTrack move along timeSlider
 		frontSliderTrack.prefWidthProperty().bind(timeSlider.widthProperty().multiply(timeSlider.valueProperty().divide(timeSlider.maxProperty())));
-	
 		
+		// prepare popups
+		createVolumePopup();
 	}
 	
 	private void resetViewLoadedLatch() {
@@ -136,6 +143,9 @@ public class MainController implements Initializable {
 		return viewLoadedLatch;
 	}
 
+	/**
+	 * Side bar 
+	 */
 	@FXML
 	private void slideSideBar(Event e) {
 		sideBar.requestFocus();
@@ -167,6 +177,38 @@ public class MainController implements Initializable {
 		isSideBarExpanded = !isSideBarExpanded;
 	}
 
+	/**
+	 * Volume popup
+	 */
+	private void createVolumePopup() {
+		try {
+			
+			Stage stage = MusicPlayer.getStage();
+			
+			FXMLLoader loader = new FXMLLoader(this.getClass().getResource(Resources.FXML + "VolumePopup.fxml"));
+			Parent view = loader.load();
+			volumePopupController = loader.getController();
+			
+			Stage popup = new Stage();
+			popup.setScene(new Scene(view));
+			popup.initStyle(StageStyle.UNDECORATED);
+        	popup.initOwner(stage);
+        	popup.setX(stage.getWidth() - 270);
+        	popup.setY(stage.getHeight() - 120);
+			popup.focusedProperty().addListener((event, wasFocused, isFocused) -> {
+				if (wasFocused && !isFocused) {
+					volumeHideAnimation.play();
+				}
+			});
+			
+			popup.show();
+			popup.hide();
+			volumePopup = popup;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@FXML
 	private void selectView(Event e) {
 	}
@@ -181,20 +223,20 @@ public class MainController implements Initializable {
 
 	@FXML
 	private void back(Event e) {
-            player.restart();
-            playing = false;
+		player.restart();
+		playing = false;
 	}
 
 	@FXML
 	private void playPause(Event e) {
-            if(playing == false) {
-                player.play();
-                playing = true;
-            }
-            else {
-                player.pause();
-                playing = false;
-            }
+		if(playing == false) {
+			player.play();
+			playing = true;
+		}
+		else {
+			player.pause();
+			playing = false;
+		}
 	}
 
 	@FXML
@@ -203,6 +245,13 @@ public class MainController implements Initializable {
 
 	@FXML
 	private void volumeClick(Event e) {
+		if (!volumePopup.isShowing()) {
+			Stage stage = MusicPlayer.getStage();
+    		volumePopup.setX(stage.getX() + stage.getWidth() - 265);
+        	volumePopup.setY(stage.getY() + stage.getHeight() - 115);
+    		volumePopup.show();
+    		volumeShowAnimation.play();
+		}
 	}
 
 	@FXML
@@ -254,4 +303,25 @@ public class MainController implements Initializable {
 			searchBox.setOpacity(frac);
 		}
 	};
+	
+	private Animation volumeShowAnimation = new Transition() {
+    	{
+            setCycleDuration(Duration.millis(250));
+            setInterpolator(Interpolator.EASE_BOTH);
+        }
+        protected void interpolate(double frac) {
+            volumePopup.setOpacity(frac);
+        }
+    };
+	
+	private Animation volumeHideAnimation = new Transition() {
+    	{
+            setCycleDuration(Duration.millis(250));
+            setInterpolator(Interpolator.EASE_BOTH);
+			setOnFinished(x -> volumePopup.hide());
+        }
+        protected void interpolate(double frac) {
+            volumePopup.setOpacity(1.0 - frac);
+        }
+    };
 }
