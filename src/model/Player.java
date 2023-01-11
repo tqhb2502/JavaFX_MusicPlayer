@@ -28,7 +28,7 @@ public class Player {
         mediaPlayer.seek(Duration.ZERO);
     }
 	
-	public void seek(int seconds) {
-		mediaPlayer.seek(new Duration(seconds * 1000));
-	}
+    public void seek(int seconds) {
+            mediaPlayer.seek(new Duration(seconds * 1000));
+    }
 }
