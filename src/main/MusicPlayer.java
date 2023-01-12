@@ -117,21 +117,23 @@ public class MusicPlayer extends Application {
 			// if now playing list is empty, set it with the songs of first artist in artists list
 			if (nowPlayingList.isEmpty()) {
 				
-				Artist artist = Library.getArtists().get(0);
-				
-				for (Album album : artist.getAlbums()) {
-					nowPlayingList.addAll(album.getSongs());
-				}
-				
-				Collections.sort(nowPlayingList, (first, second) -> {
-					Album firstAlbum = Library.getAlbum(first.getAlbum());
-                    Album secondAlbum = Library.getAlbum(second.getAlbum());
-					if (firstAlbum.compareTo(secondAlbum) != 0) {
-						return firstAlbum.compareTo(secondAlbum);
-					} else {
-						return first.compareTo(second);
-					}
-				});
+//				Artist artist = Library.getArtists().get(0);
+//				
+//				for (Album album : artist.getAlbums()) {
+//					nowPlayingList.addAll(album.getSongs());
+//				}
+//				
+//				Collections.sort(nowPlayingList, (first, second) -> {
+//					Album firstAlbum = Library.getAlbum(first.getAlbum());
+//                    Album secondAlbum = Library.getAlbum(second.getAlbum());
+//					if (firstAlbum.compareTo(secondAlbum) != 0) {
+//						return firstAlbum.compareTo(secondAlbum);
+//					} else {
+//						return first.compareTo(second);
+//					}
+//				});
+
+				nowPlayingList.addAll(Library.getSongs());
 			}
 			
 			nowPlaying = nowPlayingList.get(0);
@@ -387,6 +389,10 @@ public class MusicPlayer extends Application {
 	public static Stage getStage() {
 		return stage;
 	}
+
+	public static MainController getMainController() {
+		return mainController;
+	}
 	
 	public static void toggleLoop() {
 		isLoopActive = !isLoopActive;
@@ -418,6 +424,10 @@ public class MusicPlayer extends Application {
 	public static ArrayList<Song> getNowPlayingList() {
 		return nowPlayingList == null ? new ArrayList<>() : new ArrayList<>(nowPlayingList);
     }
+
+//	public static void setNowPlaying(Song nowPlaying) {
+//		MusicPlayer.nowPlaying = nowPlaying;
+//	}
 	
 	/**
 	 * inner class for skipping song

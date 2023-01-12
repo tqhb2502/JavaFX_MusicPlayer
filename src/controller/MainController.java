@@ -5,6 +5,7 @@ import model.Player;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
@@ -12,11 +13,15 @@ import java.util.logging.Logger;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
+import javafx.application.Platform;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -34,7 +39,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import main.MusicPlayer;
+import model.Library;
 import util.Resources;
+import util.SubView;
 
 public class MainController implements Initializable {
 	
@@ -102,6 +109,8 @@ public class MainController implements Initializable {
 	private Separator letterSeparator;
 	@FXML
 	private ScrollPane subViewRoot;
+	
+	private SubView subViewController;
 
 	/**
 	 * Initializes the controller class.
@@ -162,6 +171,8 @@ public class MainController implements Initializable {
 				MusicPlayer.seek(seconds);
 			}
 		});
+		
+		loadView("songs");
 	}
 	
 	private void resetViewLoadedLatch() {
@@ -303,7 +314,92 @@ public class MainController implements Initializable {
 	
 	@FXML
 	private void selectView(Event e) {
+		HBox eventSource = ((HBox)e.getSource());
+
+		eventSource.requestFocus();
+
+		Optional<Node> previous = sideBar.getChildren().stream()
+			.filter(x -> x.getStyleClass().get(0).equals("sideBarItemSelected")).findFirst();
+
+		if (previous.isPresent()) {
+			HBox previousItem = (HBox) previous.get();
+			previousItem.getStyleClass().setAll("sideBarItem");
+		} else {
+			previous = playlistBox.getChildren().stream()
+					.filter(x -> x.getStyleClass().get(0).equals("sideBarItemSelected")).findFirst();
+			if (previous.isPresent()) {
+				HBox previousItem = (HBox) previous.get();
+				previousItem.getStyleClass().setAll("sideBarItem");
+			}
+		}
+
+		ObservableList<String> styles = eventSource.getStyleClass();
+
+		if (styles.get(0).equals("sideBarItem")) {
+			styles.setAll("sideBarItemSelected");
+			loadView(eventSource.getId());
+		} else if (styles.get(0).equals("bottomBarItem")) {
+			loadView(eventSource.getId());
+		}
 	}
+	
+	public SubView loadView(String viewName) {
+		try {
+			String fileName = Resources.FXML + "Songs.fxml";
+			
+			FXMLLoader loader = new FXMLLoader(this.getClass().getResource(fileName));
+			Node view = loader.load();
+            
+			CountDownLatch latch = new CountDownLatch(1);
+            
+			Task<Void> task = new Task<Void>() {
+				protected Void call() throws Exception {
+					Platform.runLater(() -> {
+						Library.getSongs().stream().filter(x -> x.getSelected()).forEach(x -> x.setSelected(false));
+						subViewRoot.setVisible(false);
+						subViewRoot.setContent(view);
+						subViewRoot.getContent().setOpacity(0);
+						latch.countDown();
+					});
+					return null;
+				}
+			};
+
+			task.setOnSucceeded(x -> new Thread(() -> {
+				try {
+					latch.await();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				Platform.runLater(() -> {
+					subViewRoot.setVisible(true);
+				});
+			}).start());
+
+			Thread thread = new Thread(task);
+
+//			unloadViewAnimation.setOnFinished(x -> thread.start());
+
+//			loadViewAnimation.setOnFinished(x -> viewLoadedLatch.countDown());
+
+			if (subViewRoot.getContent() == null) {
+				subViewRoot.setContent(view);
+			} 
+			
+			subViewController = loader.getController();
+			return subViewController;
+			
+//			return loader.getController();
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
+
+	public SubView getSubViewController() {
+		return subViewController;
+	}
+	
 
 	@FXML
 	private void newPlaylist(Event e) {

@@ -130,6 +130,10 @@ public class Song implements Comparable<Song>{
         return this.playDate;
     }
 	
+	public BooleanProperty playingProperty() {
+        return this.playing;
+    }
+	
 	public boolean getPlaying() {
         return this.playing.get();
     }
