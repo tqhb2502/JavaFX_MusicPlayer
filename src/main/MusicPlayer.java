@@ -21,6 +21,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -38,7 +39,8 @@ public class MusicPlayer extends Application {
 	private static Stage stage;
 	private static MainController mainController;
 
-	private static Timer timer;	// timer for scheduling task
+	// timer for updating time label and time slider
+	private static Timer timer;
 	private static int timerCounter;
 	
 	// media player
@@ -409,6 +411,10 @@ public class MusicPlayer extends Application {
 		}
 	}
 	
+	public static Song getNowPlaying() {
+		return nowPlaying;
+	}
+	
 	public static ArrayList<Song> getNowPlayingList() {
 		return nowPlayingList == null ? new ArrayList<>() : new ArrayList<>(nowPlayingList);
     }
@@ -429,8 +435,7 @@ public class MusicPlayer extends Application {
 	 */
 	private static class TimeUpdater extends TimerTask {
 		
-		//private int length = (int) getNowPlaying().getLengthInSeconds() * 4;
-		private int length = (int) 157 * 4;
+		private int length = (int) getNowPlaying().getLengthInSeconds() * 4;
 
 		@Override
 		public void run() {
@@ -483,6 +488,7 @@ public class MusicPlayer extends Application {
 	
 	/**
 	 * seek
+	 * @param seconds point of time
 	 */
 	public static void seek(int seconds) {
 		if (mediaPlayer != null) {
