@@ -11,6 +11,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import main.MusicPlayer;
+import util.SubView;
 
 /**
  * FXML Controller class
@@ -36,6 +38,10 @@ public class ControlPanelController implements Initializable {
 
 	@FXML
 	private void playSong(MouseEvent event) {
+		SubView controller = MusicPlayer.getMainController().getSubViewController();
+		controller.play();
+		event.consume();
+		
 	}
 
 	@FXML

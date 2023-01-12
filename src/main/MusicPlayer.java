@@ -389,6 +389,10 @@ public class MusicPlayer extends Application {
 	public static Stage getStage() {
 		return stage;
 	}
+
+	public static MainController getMainController() {
+		return mainController;
+	}
 	
 	public static void toggleLoop() {
 		isLoopActive = !isLoopActive;
@@ -507,6 +511,10 @@ public class MusicPlayer extends Application {
 	public static ArrayList<Song> getNowPlayingList() {
 		return nowPlayingList == null ? new ArrayList<>() : new ArrayList<>(nowPlayingList);
     }
+
+//	public static void setNowPlaying(Song nowPlaying) {
+//		MusicPlayer.nowPlaying = nowPlaying;
+//	}
 	
 	/**
 	 * inner class for skipping song
