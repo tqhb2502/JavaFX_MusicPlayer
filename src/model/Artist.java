@@ -12,6 +12,7 @@ import java.util.ArrayList;
  * @author Admin
  */
 public class Artist implements Comparable<Artist>{
+	
     private String title;
     private ArrayList<Album> albums;
 

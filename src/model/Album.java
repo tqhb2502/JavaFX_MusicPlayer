@@ -17,7 +17,7 @@ public class Album implements Comparable<Album>{
     private String title;
     private ArrayList<Song> songs;
 
-    public Album(int id, String artist, String title, ArrayList<Song> songs) {
+    public Album(int id, String title, String artist, ArrayList<Song> songs) {
         this.id = id;
         this.artist = artist;
         this.title = title;
