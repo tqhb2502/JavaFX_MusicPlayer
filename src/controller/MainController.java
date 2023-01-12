@@ -268,6 +268,7 @@ public class MainController implements Initializable {
 		
 	}
 	
+	// todo
 	public void updateTimeSlider() {
 		
 	}
@@ -280,6 +281,7 @@ public class MainController implements Initializable {
 		
 	}
 	
+	// todo
 	public void updateTimeLabels() {
 		
 	}
