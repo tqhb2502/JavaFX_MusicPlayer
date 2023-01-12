@@ -403,22 +403,109 @@ public class MusicPlayer extends Application {
 	}
 	
 	public static void toggleShuffle() {
+		
 		isShuffleActive = !isShuffleActive;
+		
+		if (isShuffleActive) {
+			Collections.shuffle(nowPlayingList);
+		} else {
+			Collections.sort(nowPlayingList, (first, second) -> {
+				
+				Album firstAlbum = Library.getAlbum(first.getAlbum());
+				Album secondAlbum = Library.getAlbum(second.getAlbum());
+				
+				int result = firstAlbum.compareTo(secondAlbum);
+				if (result != 0) {
+					return result;
+				}
+				
+				result = first.compareTo(second);
+				return result;
+			});
+		}
+		
+		nowPlayingIndex = nowPlayingList.indexOf(nowPlaying);
+		
+		// load subview
 	}
 	
 	public static boolean isShuffleActive() {
 		return isShuffleActive;
 	}
 	
-	public static void toggleMute() {
-		isMuted = !isMuted;
-		if (mediaPlayer != null) {
-			mediaPlayer.setMute(!isMuted);
-		}
+	private static void updatePlayCount() {
+		
 	}
 	
 	public static Song getNowPlaying() {
 		return nowPlaying;
+	}
+	
+	public static void setNowPlaying(Song song) {
+		
+		if (nowPlayingList.contains(song)) {
+			
+			// updates prev song's info
+			updatePlayCount();
+			if (nowPlaying != null) {
+				nowPlaying.setPlaying(false);
+			}
+			
+			// assigns current song
+			nowPlaying = song;
+			nowPlaying.setPlaying(true);
+			nowPlayingIndex = nowPlayingList.indexOf(song);
+		
+			// stop media player & timer
+			if (mediaPlayer != null) {
+				mediaPlayer.stop();
+			}
+			
+			if (timer != null) {
+				timer.cancel();
+			}
+			
+			// set media player & timer for current xong
+			timer = new Timer();
+			timerCounter = 0;
+			secondsPlayed = 0;
+			
+			String path = song.getLocation();
+			Media media = new Media(Paths.get(path).toUri().toString());
+			mediaPlayer = new MediaPlayer(media);
+			// bind volume
+			mediaPlayer.setOnEndOfMedia(new SongSkipper());
+			mediaPlayer.setMute(isMuted);
+			
+			// set UI for current song
+			mainController.updateNowPlayingButton();
+			mainController.initializeTimeLabels();
+			mainController.initializeTimeSlider();
+		}
+	}
+	
+	/**
+	 * Get time passed in mm:ss
+	 * @return mm:ss format string
+	 */
+	public static String getTimePassed() {
+		int secondsPassed = timerCounter / 4;
+		int minutes = secondsPassed / 60;
+        int seconds = secondsPassed % 60;
+        return Integer.toString(minutes) + ":" + (seconds < 10 ? "0" + seconds : Integer.toString(seconds));
+	}
+	
+	/**
+	 * Get time remaining in mm:ss
+	 * @return mm:ss format string
+	 */
+	public static String getTimeRemaining() {
+		long secondsPassed = timerCounter / 4;
+		long totalSeconds = getNowPlaying().getLengthInSeconds();
+		long secondsRemaining = totalSeconds - secondsPassed;
+		long minutes = secondsRemaining / 60;
+        long seconds = secondsRemaining % 60;
+        return Long.toString(minutes) + ":" + (seconds < 10 ? "0" + seconds : Long.toString(seconds));
 	}
 	
 	public static ArrayList<Song> getNowPlayingList() {
@@ -466,6 +553,14 @@ public class MusicPlayer extends Application {
 	}
 	
 	/**
+	 * Check if a song is being played
+	 * @return true: playing, false: not playing
+	 */
+	public static boolean isPlaying() {
+		return mediaPlayer != null && MediaPlayer.Status.PLAYING.equals(mediaPlayer.getStatus());
+	}
+	
+	/**
 	 * Play selected song
 	 */
 	public static void play() {
@@ -474,14 +569,6 @@ public class MusicPlayer extends Application {
 			timer.scheduleAtFixedRate(new TimeUpdater(), 0, 250);
 			mainController.updatePlayPauseIcon(true);
 		}
-	}
-	
-	/**
-	 * Check if a song is being played
-	 * @return true: playing, false: not playing
-	 */
-	public static boolean isPlaying() {
-		return mediaPlayer != null && MediaPlayer.Status.PLAYING.equals(mediaPlayer.getStatus());
 	}
 	
 	/**
@@ -513,6 +600,19 @@ public class MusicPlayer extends Application {
 	 */
 	public static void skip() {
 		
+		boolean isPlaying = isPlaying();
+		mainController.updatePlayPauseIcon(isPlaying);
+		
+		if (isLoopActive()) {
+			setNowPlaying(nowPlayingList.get(nowPlayingIndex));
+		} else {
+			int nextSongIndex = (nowPlayingIndex + 1) % nowPlayingList.size();
+			setNowPlaying(nowPlayingList.get(nextSongIndex));
+		}
+		
+		if (isPlaying) {
+			play();
+		}
 	}
 	
 	/**
@@ -520,5 +620,29 @@ public class MusicPlayer extends Application {
 	 */
 	public static void back() {
 		
+		boolean isPlaying = isPlaying();
+		mainController.updatePlayPauseIcon(isPlaying);
+		
+		if (isLoopActive()) {
+			setNowPlaying(nowPlayingList.get(nowPlayingIndex));
+		} else {
+			int nextSongIndex = (nowPlayingIndex + nowPlayingList.size() - 1) % nowPlayingList.size();
+			setNowPlaying(nowPlayingList.get(nextSongIndex));
+		}
+		
+		if (isPlaying) {
+			play();
+		}
 	}
+	
+	/**
+	 * mutes or unmutes media player
+	 * @param isMuted true: mutes, false: unmutes
+	 */
+	public static void mute(boolean isMuted) {
+        MusicPlayer.isMuted = isMuted;
+        if (mediaPlayer != null) {
+            mediaPlayer.setMute(isMuted);
+        }
+    }
 }

@@ -57,6 +57,7 @@ public class Song implements Comparable<Song>{
         this.title = new SimpleStringProperty(title);
         this.album = new SimpleStringProperty(album);
         this.artist = new SimpleStringProperty(artist);
+		this.lengthInSeconds = length.getSeconds();
 		long seconds = length.getSeconds() % 60;
         this.length = new SimpleStringProperty(length.toMinutes() + ":" + (seconds < 10 ? "0" + seconds : seconds));
         this.trackNumber = trackNumber;
