@@ -34,6 +34,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import main.MusicPlayer;
+import model.Song;
 import util.Resources;
 
 public class MainController implements Initializable {
@@ -108,18 +109,6 @@ public class MainController implements Initializable {
 	 */
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
-        
-		// play music
-//		Path fileName = Path.of("src/resource/music.txt");
-//
-//		String song = null;
-//		try {
-//			song = Files.readString(fileName);
-//		} catch (IOException ex) {
-//			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-//		}
-//		source = "src/resource/song/"+song;
-//		player = new Player(source);
 		
 		// prepare latch
 		resetViewLoadedLatch();
@@ -150,7 +139,7 @@ public class MainController implements Initializable {
 			shuffleButton.pseudoClassStateChanged(active, MusicPlayer.isShuffleActive());
 		});
 		
-		// time slider
+		// time slider value change
 		timeSlider.setFocusTraversable(false);
 		
 		timeSlider.valueChangingProperty().addListener((slider, wasChanging, isChanging) -> {
@@ -158,10 +147,33 @@ public class MainController implements Initializable {
 			if (wasChanging) {
 				
 				int seconds = (int) Math.round(timeSlider.getValue() / 4.0);
+				
 				timeSlider.setValue(seconds * 4);
 				MusicPlayer.seek(seconds);
 			}
 		});
+		
+		timeSlider.valueProperty().addListener((slider, oldValue, newValue) -> {
+			
+			double previous = oldValue.doubleValue();
+			double current = newValue.doubleValue();
+			
+			if (!timeSlider.isValueChanging() && current != previous + 1) {
+				
+				int seconds = (int) Math.round(current / 4.0);
+				
+				timeSlider.setValue(seconds * 4);
+				MusicPlayer.seek(seconds);
+			}
+		});
+		
+		// displays now playing song's info
+		updateNowPlayingButton();
+		initializeTimeLabels();
+		initializeTimeSlider();
+		//playlist
+		
+		// loads default sub view
 	}
 	
 	private void resetViewLoadedLatch() {
@@ -262,15 +274,38 @@ public class MainController implements Initializable {
 	
 	public void updateNowPlayingButton() {
 		
+		Song song = MusicPlayer.getNowPlaying();
+		
+		if (song != null) {
+			nowPlayingTitle.setText(song.getTitle());
+			nowPlayingArtist.setText(song.getArtist());
+			nowPlayingArtwork.setImage(null);
+		} else {
+			nowPlayingTitle.setText("");
+			nowPlayingArtist.setText("");
+			nowPlayingArtwork.setImage(null);
+		}
 	}
 	
 	public void initializeTimeSlider() {
 		
+		Song song = MusicPlayer.getNowPlaying();
+		
+		if (song != null) {
+			timeSlider.setMin(0);
+            timeSlider.setMax(song.getLengthInSeconds() * 4);
+            timeSlider.setValue(0);
+            timeSlider.setBlockIncrement(1);
+		} else {
+			timeSlider.setMin(0);
+            timeSlider.setMax(1);
+            timeSlider.setValue(0);
+            timeSlider.setBlockIncrement(1);
+		}
 	}
 	
-	// todo
 	public void updateTimeSlider() {
-		
+		timeSlider.increment();
 	}
 	
 	public boolean isTimeSliderPressed() {
@@ -279,11 +314,20 @@ public class MainController implements Initializable {
 	
 	public void initializeTimeLabels() {
 		
-	}
-	
-	// todo
-	public void updateTimeLabels() {
+		Song song = MusicPlayer.getNowPlaying();
 		
+		if (song != null) {
+			timePassed.setText("0:00");
+			timeRemaining.setText(song.getLength());
+		} else {
+			timePassed.setText("");
+			timeRemaining.setText("");
+		}
+	}
+
+	public void updateTimeLabels() {
+		timePassed.setText(MusicPlayer.getTimePassed());
+		timeRemaining.setText(MusicPlayer.getTimeRemaining());
 	}
 	
 	/**
@@ -315,6 +359,9 @@ public class MainController implements Initializable {
 
 	@FXML
 	private void back(Event e) {
+		
+		sideBar.requestFocus();
+		MusicPlayer.back();
 	}
 
 	@FXML
@@ -331,6 +378,9 @@ public class MainController implements Initializable {
 
 	@FXML
 	private void skip(Event e) {
+		
+		sideBar.requestFocus();
+		MusicPlayer.skip();
 	}
 
 	@FXML
