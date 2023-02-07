@@ -187,7 +187,7 @@ public class Library {
                     Element location = doc.createElement("location");
 					
 					// fill song's info into elements
-					id.setTextContent(Integer.toString(i));
+					id.setTextContent(Integer.toString(i++));
 					title.setTextContent(tag.getFirst(FieldKey.TITLE));
 					String artistTitle = tag.getFirst(FieldKey.ALBUM_ARTIST);
                     if (artistTitle == null || artistTitle.equals("") || artistTitle.equals("null")) {
