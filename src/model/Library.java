@@ -187,7 +187,7 @@ public class Library {
                     Element location = doc.createElement("location");
 					
 					// fill song's info into elements
-					id.setTextContent(Integer.toString(i));
+					id.setTextContent(Integer.toString(i++));
 					title.setTextContent(tag.getFirst(FieldKey.TITLE));
 					String artistTitle = tag.getFirst(FieldKey.ALBUM_ARTIST);
                     if (artistTitle == null || artistTitle.equals("") || artistTitle.equals("null")) {
@@ -514,6 +514,147 @@ public class Library {
 	}
 	
 	// playlist
+	
+	public static void addPlaylist(String text) {
+
+        Thread thread = new Thread(() -> {
+
+            int i = playlists.size() - 2;
+            playlists.add(new Playlist(i, text, new ArrayList<>()));
+
+            try {
+                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+                Document doc = docBuilder.parse(Resources.JAR + "library.xml");
+
+                XPathFactory xPathfactory = XPathFactory.newInstance();
+                XPath xpath = xPathfactory.newXPath();
+
+                XPathExpression expr = xpath.compile("/library/playlists");
+                Node playlists = ((NodeList) expr.evaluate(doc, XPathConstants.NODESET)).item(0);
+
+                Element playlist = doc.createElement("playlist");
+                playlist.setAttribute("id", Integer.toString(i));
+                playlist.setAttribute(TITLE, text);
+                playlists.appendChild(playlist);
+
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                DOMSource source = new DOMSource(doc);
+                File xmlFile = new File(Resources.JAR + "library.xml");
+                StreamResult result = new StreamResult(xmlFile);
+                transformer.transform(source, result);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+        });
+
+        thread.start();
+    }
+
+    public static void removePlaylist(Playlist playlist) {
+        playlists.remove(playlist);
+    }
+
+    public static ObservableList<Playlist> getPlaylists() {
+        if (playlists == null) {
+
+            playlists = new ArrayList<>();
+            int id = 0;
+
+            try {
+                XMLInputFactory factory = XMLInputFactory.newInstance();
+                factory.setProperty("javax.xml.stream.isCoalescing", true);
+                FileInputStream is = new FileInputStream(new File(Resources.JAR + "library.xml"));
+                XMLStreamReader reader = factory.createXMLStreamReader(is, "UTF-8");
+
+                String element;
+                boolean isPlaylist = false;
+                String title = null;
+                ArrayList<Song> songs = new ArrayList<>();
+
+                while(reader.hasNext()) {
+                    reader.next();
+                    if (reader.isWhiteSpace()) {
+                        continue;
+                    } else if (reader.isStartElement()) {
+                        element = reader.getName().getLocalPart();
+
+                        // If the element is a play list, reads the element attributes to retrieve
+                        // the play list id and title.
+                        if (element.equals("playlist")) {
+                            isPlaylist = true;
+
+                            id = Integer.parseInt(reader.getAttributeValue(0));
+                            title = reader.getAttributeValue(1);
+                        }
+                    } else if (reader.isCharacters() && isPlaylist) {
+                        // Retrieves the reader value (song ID), gets the song and adds it to the songs list.
+                        String value = reader.getText();
+                        songs.add(getSong(Integer.parseInt(value)));
+                    } else if (reader.isEndElement() && reader.getName().getLocalPart().equals("playlist")) {
+                        // If the play list id, title, and songs have been retrieved, a new play list is created
+                        // and the values reset.
+                        playlists.add(new Playlist(id, title, songs));
+                        id = -1;
+                        title = null;
+                        songs = new ArrayList<>();
+                    } else if (reader.isEndElement() && reader.getName().getLocalPart().equals("playlists")) {
+                        reader.close();
+                        break;
+                    }
+                }
+                reader.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            playlists.sort((x, y) -> {
+                if (x.getId() < y.getId()) {
+                    return 1;
+                } else if (x.getId() > y.getId()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            });
+
+//            playlists.add(new MostPlayedPlaylist(-2));
+//            playlists.add(new RecentlyPlayedPlaylist(-1));
+        } else {
+            playlists.sort((x, y) -> {
+                if (x.getId() < y.getId()) {
+                    return 1;
+                } else if (x.getId() > y.getId()) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            });
+        }
+        return FXCollections.observableArrayList(playlists);
+    }
+	
+	public static Playlist getPlaylist(int id) {
+        if (playlists == null) {
+            getPlaylists();
+        }
+        // Gets the play list size.
+        int playListSize = Library.getPlaylists().size();
+        // The +2 takes into account the two default play lists.
+        // The -1 is used because size() starts at 1 but indexes start at 0.
+        return playlists.get(playListSize - (id + 2) - 1);
+    }
+	
+	public static Playlist getPlaylist(String title) {
+        if (playlists == null) {
+            getPlaylists();
+        }
+        return playlists.stream().filter(playlist -> title.equals(playlist.getTitle())).findFirst().get();
+    }
 	
 	/**
 	 * Get playing list from library.xml

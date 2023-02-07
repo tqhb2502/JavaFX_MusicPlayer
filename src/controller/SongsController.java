@@ -115,7 +115,7 @@ public class SongsController implements Initializable, SubView {
 				if (event.getClickCount() == 2 && !row.isEmpty()) {    
 //					selectedSong = tableView.getSelectionModel().getSelectedItems();
 					selectedSong = sm.getSelectedItem();
-					System.out.println(sm.getSelectedItem().getTitle());
+					System.out.println(selectedSong.getTitle());
 					play();
 				} else if (event.isShiftDown()) {
 					ArrayList<Integer> indices = new ArrayList<>(sm.getSelectedIndices());
@@ -176,7 +176,7 @@ public class SongsController implements Initializable, SubView {
 		
 		// Plays selected song when enter key is pressed.
 		tableView.setOnKeyPressed(event -> {
-			if (event.getCode().equals(KeyCode.SPACE)) {
+			if (event.getCode().equals(KeyCode.ENTER)) {
 				play();
 			}
 		});
@@ -228,6 +228,7 @@ public class SongsController implements Initializable, SubView {
 	
 	@Override
 	public void play() {
+		System.out.println("play");
 		Song song = selectedSong;
 //		ObservableList<Song> songList = tableView.getItems();
 //		if(MusicPlayer.isShuffleActive()) {

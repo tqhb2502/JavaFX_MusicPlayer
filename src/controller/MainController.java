@@ -11,6 +11,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.Animation;
+import javafx.animation.Animation.Status;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
 import javafx.application.Platform;
@@ -21,6 +22,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -30,6 +32,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -40,6 +43,7 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import main.MusicPlayer;
 import model.Library;
+import model.Playlist;
 import model.Song;
 import util.Resources;
 import util.SubView;
@@ -181,6 +185,7 @@ public class MainController implements Initializable {
 		initializeTimeLabels();
 		initializeTimeSlider();
 		//playlist
+		initializePlaylists();
 		
 		// loads default sub view
     loadView("songs");
@@ -377,7 +382,7 @@ public class MainController implements Initializable {
 		}
 
 		ObservableList<String> styles = eventSource.getStyleClass();
-
+		System.out.println("load view " + eventSource.getId());
 		if (styles.get(0).equals("sideBarItem")) {
 			styles.setAll("sideBarItemSelected");
 			loadView(eventSource.getId());
@@ -388,7 +393,7 @@ public class MainController implements Initializable {
 	
 	public SubView loadView(String viewName) {
 		try {
-			String fileName = Resources.FXML + "Songs.fxml";
+			String fileName = Resources.FXML + viewName + ".fxml";
 			
 			FXMLLoader loader = new FXMLLoader(this.getClass().getResource(fileName));
 			Node view = loader.load();
@@ -416,18 +421,24 @@ public class MainController implements Initializable {
 				}
 				Platform.runLater(() -> {
 					subViewRoot.setVisible(true);
+					loadViewAnimation.play();
 				});
 			}).start());
 
 			Thread thread = new Thread(task);
 
-//			unloadViewAnimation.setOnFinished(x -> thread.start());
+			unloadViewAnimation.setOnFinished(x -> thread.start());
 
-//			loadViewAnimation.setOnFinished(x -> viewLoadedLatch.countDown());
+			loadViewAnimation.setOnFinished(x -> viewLoadedLatch.countDown());
 
 			if (subViewRoot.getContent() == null) {
+				
 				subViewRoot.setContent(view);
+				loadViewAnimation.play();
 			} 
+			else {
+				unloadViewAnimation.play();
+			}
 			
 			subViewController = loader.getController();
 			return subViewController;
@@ -438,15 +449,146 @@ public class MainController implements Initializable {
 			return null;
 		}
 	}
+	
+	private Animation loadViewAnimation = new Transition() {
+        {
+            setCycleDuration(Duration.millis(250));
+            setInterpolator(Interpolator.EASE_BOTH);
+        }
+        protected void interpolate(double frac) {
+            subViewRoot.setVvalue(0);
+            double curHeight = collapsedHeight + (expandedHeight - collapsedHeight) * (frac);
+            subViewRoot.getContent().setTranslateY(expandedHeight - curHeight);
+            subViewRoot.getContent().setOpacity(frac);
+        }
+    };
+    
+    private Animation unloadViewAnimation = new Transition() {
+        {
+            setCycleDuration(Duration.millis(250));
+            setInterpolator(Interpolator.EASE_BOTH);
+        }
+        protected void interpolate(double frac) {
+            double curHeight = collapsedHeight + (expandedHeight - collapsedHeight) * (1 - frac);
+            subViewRoot.getContent().setTranslateY(expandedHeight - curHeight);
+            subViewRoot.getContent().setOpacity(1 - frac);
+        }
+    };
 
 	public SubView getSubViewController() {
 		return subViewController;
 	}
 	
+	private String checkDuplicatePlaylist(String text, int i) {
+    	for (Playlist playlist : Library.getPlaylists()) {
+    		if (playlist.getTitle().equals(text)) {
+    			
+    			int index = text.lastIndexOf(' ') + 1;
+    			if (index != 0) {
+    				try {
+    					i = Integer.parseInt(text.substring(index));
+    				} catch (Exception ex) {
+    					// do nothing
+    				}
+    			}
+    			
+    			i++;
+    			
+    			if (i == 1) {
+    				text = checkDuplicatePlaylist(text + " " + i, i);
+    			} else {
+    				text = checkDuplicatePlaylist(text.substring(0, index) + i, i);
+    			}
+    			break;
+    		}
+    	}
+    	
+    	return text;
+    }
+	
+	private void initializePlaylists() {
+    	for (Playlist playlist : Library.getPlaylists()) {
+    		try {
+    			FXMLLoader loader = new FXMLLoader(this.getClass().getResource(Resources.FXML + "PlaylistCell.fxml"));
+				HBox cell = loader.load();
+				Label label = (Label) cell.getChildren().get(1);
+				label.setText(playlist.getTitle());
+				
+				cell.setOnMouseClicked(x -> {
+					selectView(x);
+					((PlaylistsController) subViewController).selectPlaylist(playlist);
+				});
+				
+				
+//				PseudoClass hover = PseudoClass.getPseudoClass("hover");
+				
+				playlistBox.getChildren().add(cell);
+				
+			} catch (Exception e) {
+				
+				e.printStackTrace();
+			}
+    	}
+    }
 
 	@FXML
-	private void newPlaylist(Event e) {
-	}
+    private void newPlaylist() {
+    	System.out.println("New playlist");
+		if (!newPlaylistAnimation.getStatus().equals(Status.RUNNING)) 
+		try {
+
+			FXMLLoader loader = new FXMLLoader(this.getClass().getResource(Resources.FXML + "PlaylistCell.fxml"));
+			HBox cell = loader.load();
+
+			Label label = (Label) cell.getChildren().get(1);
+			label.setVisible(false);
+			HBox.setMargin(label, new Insets(0, 0, 0, 0));
+
+			TextField textBox = new TextField();
+			textBox.setPrefHeight(30);
+			cell.getChildren().add(textBox);
+			HBox.setMargin(textBox, new Insets(10, 10, 10, 9));
+
+			textBox.focusedProperty().addListener((obs, oldValue, newValue) -> {
+				if (oldValue && !newValue) {
+					String text = textBox.getText().equals("") ? "New Playlist" : textBox.getText();
+					text = checkDuplicatePlaylist(text, 0);
+					label.setText(text);
+					cell.getChildren().remove(textBox);
+					HBox.setMargin(label, new Insets(10, 10, 10, 10));
+					label.setVisible(true);
+					Library.addPlaylist(text);
+				}
+			});
+
+			textBox.setOnKeyPressed(x -> {
+				if (x.getCode() == KeyCode.ENTER)  {
+					sideBar.requestFocus();
+				}
+			});
+
+			cell.setOnMouseClicked(x -> {
+				selectView(x);
+				Playlist playlist = Library.getPlaylist(label.getText());
+				((PlaylistsController) subViewController).selectPlaylist(playlist);
+			});
+			
+
+			cell.setPrefHeight(0);
+			cell.setOpacity(0);
+
+			playlistBox.getChildren().add(1, cell);
+
+			textBox.requestFocus();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+		
+		newPlaylistAnimation.play();
+        	
+    }
 
 	@FXML
 	private void navigateToCurrentSong(Event e) {
@@ -582,4 +724,24 @@ public class MainController implements Initializable {
 			searchPopup.setOpacity(1.0 - frac);
 		}
 	};
+	
+	private Animation newPlaylistAnimation = new Transition() {
+    	{
+            setCycleDuration(Duration.millis(500));
+            setInterpolator(Interpolator.EASE_BOTH);
+        }
+        protected void interpolate(double frac) {
+    		HBox cell = (HBox) playlistBox.getChildren().get(1);
+    		if (frac < 0.5) {
+    			cell.setPrefHeight(frac * 100);
+    		} else {
+    			cell.setPrefHeight(50);
+    			cell.setOpacity((frac - 0.5) * 2);
+    		}
+        }
+    };
+
+	public VBox getPlaylistBox() {
+		return playlistBox;
+	}
 }

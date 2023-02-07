@@ -7,6 +7,8 @@ package model;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -59,8 +61,8 @@ public class Playlist {
         return title;
     }
 
-    public ArrayList<Song> getSongs() {
-        return songs;
+    public ObservableList<Song> getSongs() {
+        return FXCollections.observableArrayList(songs);
     }
     
     public void addSong(Song s) {
