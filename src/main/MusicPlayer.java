@@ -80,11 +80,6 @@ public class MusicPlayer extends Application {
 		MusicPlayer.stage.setTitle("Music Player");
 		Image musicPlayerIcon = new Image(this.getClass().getResource(Resources.IMG + "Icon.png").toString());
 		MusicPlayer.stage.getIcons().add(musicPlayerIcon);
-//		MusicPlayer.stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
-//			if (!newValue) {
-//				MusicPlayer.stage.requestFocus();
-//			}
-//		});
 		MusicPlayer.stage.setOnCloseRequest(event -> {
 			Platform.exit();
 			System.exit(0);
@@ -393,7 +388,9 @@ public class MusicPlayer extends Application {
 			
 			// Gives the controller access to the music player main application
 			mainController = loader.getController();
-			//mediaPlayer.volumeProperty().bind(mainController);
+			
+			// bind music player volume to volume slider
+			// todo
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
