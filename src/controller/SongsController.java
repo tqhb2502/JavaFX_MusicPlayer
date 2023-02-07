@@ -115,7 +115,6 @@ public class SongsController implements Initializable, SubView {
 				if (event.getClickCount() == 2 && !row.isEmpty()) {    
 //					selectedSong = tableView.getSelectionModel().getSelectedItems();
 					selectedSong = sm.getSelectedItem();
-					System.out.println(sm.getSelectedItem().getTitle());
 					play();
 				} else if (event.isShiftDown()) {
 					ArrayList<Integer> indices = new ArrayList<>(sm.getSelectedIndices());

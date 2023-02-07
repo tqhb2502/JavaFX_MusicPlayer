@@ -1,12 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package model;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,15 +30,10 @@ import org.xml.sax.SAXException;
 
 import util.Resources;
 
-/**
- *
- * @author Admin
- */
 public class Playlist {
+	
     private int id;
     private String title;
-    
-//    private Song songs[];
     private ArrayList<Song> songs;
 
     public Playlist(int id, String title, ArrayList<Song> songs) {
@@ -48,8 +41,6 @@ public class Playlist {
         this.title = title;
         this.songs = songs;
     }
-
-    
 
     public int getId() {
         return id;
@@ -59,16 +50,19 @@ public class Playlist {
         return title;
     }
 
-    public ArrayList<Song> getSongs() {
-        return songs;
+    public ObservableList<Song> getSongs() {
+        return FXCollections.observableArrayList(this.songs);
     }
     
     public void addSong(Song s) {
+		
         if(!songs.contains(s)) {
+			
             songs.add(s);
             
             /// write to xml file code below
             try {
+				
     			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
     			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
     			Document doc = docBuilder.parse(Resources.JAR + "library.xml");
