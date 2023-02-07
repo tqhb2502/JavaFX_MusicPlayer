@@ -86,7 +86,8 @@ public class Playlist {
     			StreamResult result = new StreamResult(xmlFile);
     			transformer.transform(source, result);
 
-    		} catch (IOException | IllegalArgumentException | ParserConfigurationException | TransformerException | XPathExpressionException | DOMException | SAXException ex) {
+    		} catch (Exception ex) {
+				ex.printStackTrace();
     		}
         }
     }
@@ -103,5 +104,7 @@ public class Playlist {
         return false;
     }
     
-                 
+	public String toString() {
+		return this.title;
+	}
 }
