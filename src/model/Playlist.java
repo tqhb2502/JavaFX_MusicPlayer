@@ -51,7 +51,7 @@ public class Playlist {
     }
 
     public ObservableList<Song> getSongs() {
-        return FXCollections.observableArrayList(this.songs);
+        return FXCollections.observableArrayList(songs);
     }
     
     public void addSong(Song s) {

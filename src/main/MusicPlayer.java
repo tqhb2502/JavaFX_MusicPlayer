@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Application;
@@ -33,6 +34,7 @@ import model.Artist;
 import model.Library;
 import model.Song;
 import util.Resources;
+import util.XMLEditor;
 
 public class MusicPlayer extends Application {
 	
@@ -115,6 +117,7 @@ public class MusicPlayer extends Application {
 			Library.getAlbums();
 			Library.getArtists();
 			// get playlists
+			Library.getPlaylists();
 			
 			// retrieves playing list
 			nowPlayingList = Library.loadPlayingList();
@@ -324,7 +327,12 @@ public class MusicPlayer extends Application {
 	 * @param musicDirectory path of music directory
 	 */
 	private static void updateLibraryXML(Path musicDirectory) {
-		
+		// Sets the music directory for the XMLEditor.
+        XMLEditor.setMusicDirectory(musicDirectory);
+
+        // Checks if songs have to be added, deleted, or both to the xml file and
+        // performs the corresponding operation.
+        XMLEditor.addDeleteChecker();
 	}
 	
 	private static void createLibraryXML() {
@@ -517,9 +525,17 @@ public class MusicPlayer extends Application {
 		return nowPlayingList == null ? new ArrayList<>() : new ArrayList<>(nowPlayingList);
     }
 
-//	public static void setNowPlaying(Song nowPlaying) {
-//		MusicPlayer.nowPlaying = nowPlaying;
-//	}
+	public static void setNowPlayingList(List<Song> list) {
+        nowPlayingList = new ArrayList<>(list);
+        Library.savePlayingList();
+    }
+	
+	public static void addSongToNowPlayingList(Song song) {
+        if (!nowPlayingList.contains(song)) {
+            nowPlayingList.add(song);
+            Library.savePlayingList();
+        }
+    }
 	
 	/**
 	 * inner class for skipping song
@@ -650,4 +666,22 @@ public class MusicPlayer extends Application {
             mediaPlayer.setMute(isMuted);
         }
     }
+	
+	
+	public static int getXMLFileNum() {
+        return xmlFileNum;
+    }
+
+    public static void setXMLFileNum(int i) {
+        xmlFileNum = i;
+    }
+
+	public static int getLastIdAssigned() {
+        return lastIdAssigned;
+    }
+
+    public static void setLastIdAssigned(int i) {
+        lastIdAssigned = i;
+    }
+
 }

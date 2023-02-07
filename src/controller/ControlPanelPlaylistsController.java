@@ -11,6 +11,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import main.MusicPlayer;
+import model.Library;
+import util.SubView;
+import util.XMLEditor;
 
 /**
  * FXML Controller class
@@ -36,10 +40,29 @@ public class ControlPanelPlaylistsController implements Initializable {
 
 	@FXML
 	private void playSong(MouseEvent event) {
+		SubView controller = MusicPlayer.getMainController().getSubViewController();
+		controller.play();
+		event.consume();
 	}
 
 	@FXML
 	private void deleteSong(MouseEvent event) {
+		PlaylistsController controller = (PlaylistsController) MusicPlayer.getMainController().getSubViewController();
+		
+		// Retrieves play list and song id to search for the song in the xml file.
+		int selectedPlayListId = controller.getSelectedPlaylist().getId();
+		int selectedSongId = controller.getSelectedSong().getId();
+		
+		// Calls methods to delete selected song from play list in XML file.
+		XMLEditor.deleteSongFromPlaylist(selectedPlayListId, selectedSongId);
+
+        // Removes the selected song from the playlist's song list in Library.
+        Library.getPlaylist(selectedPlayListId).removeSong(selectedSongId);
+		
+		// Deletes the selected row from the table view.
+		controller.deleteSelectedRow();
+		
+		event.consume();
 	}
 	
 }
