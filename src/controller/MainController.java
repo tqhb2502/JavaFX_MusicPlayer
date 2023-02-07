@@ -19,14 +19,17 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
@@ -44,8 +47,10 @@ import javafx.util.Duration;
 import main.MusicPlayer;
 import model.Library;
 import model.Playlist;
+import model.SearchResult;
 import model.Song;
 import util.Resources;
+import util.Search;
 import util.SubView;
 
 public class MainController implements Initializable {
@@ -152,7 +157,7 @@ public class MainController implements Initializable {
 			shuffleButton.pseudoClassStateChanged(active, MusicPlayer.isShuffleActive());
 		});
 		
-		// time slider value change
+		// time slider listener
 		timeSlider.setFocusTraversable(false);
 		
 		timeSlider.valueChangingProperty().addListener((slider, wasChanging, isChanging) -> {
@@ -180,6 +185,59 @@ public class MainController implements Initializable {
 			}
 		});
 		
+		// search box listener
+		searchBox.textProperty().addListener((observable, oldText, newText) -> {
+			
+			String text = newText.trim();
+			
+			if (text.equals("")) {
+				// hide search popup when there is nothing in search box
+				if (searchPopup.isShowing() && !searchHideAnimation.getStatus().equals(Animation.Status.RUNNING)) {
+					searchHideAnimation.play();
+				}
+			} else {
+				// otherwise, execute searching
+				Search.search(text);
+			}
+		});
+		
+		// when searching process found results, show it
+		Search.hasResultsProperty().addListener((observable, oldValue, newValue) -> {
+			
+			if (newValue) {
+				
+				// show results
+				SearchResult result = Search.getResult();
+				Platform.runLater(() -> {
+					showSearchResults(result);
+//					MusicPlayer.getStage().toFront();
+				});
+				
+				// set height for search result popup
+				int height = 0;
+                int artists = result.getArtistResults().size();
+                int albums = result.getAlbumResults().size();
+                int songs = result.getSongResults().size();
+                if (artists > 0) height += (artists * 50) + 50;
+                if (albums > 0) height += (albums * 50) + 50;
+                if (songs > 0) height += (songs * 50) + 50;
+                if (height == 0) height = 50;
+                searchPopup.setHeight(height);
+			}
+		});
+		
+		// hide search result popup when user moves or resizes the window
+		MusicPlayer.getStage().xProperty().addListener((observable, oldValue, newValue) -> {
+			if (searchPopup.isShowing() && !searchHideAnimation.getStatus().equals(Animation.Status.RUNNING)) {
+				searchHideAnimation.play();
+			}
+		});
+		MusicPlayer.getStage().yProperty().addListener((observable, oldValue, newValue) -> {
+			if (searchPopup.isShowing() && !searchHideAnimation.getStatus().equals(Animation.Status.RUNNING)) {
+				searchHideAnimation.play();
+			}
+		});
+		
 		// displays now playing song's info
 		updateNowPlayingButton();
 		initializeTimeLabels();
@@ -188,7 +246,7 @@ public class MainController implements Initializable {
 		initializePlaylists();
 		
 		// loads default sub view
-    loadView("songs");
+		loadView("songs");
 	}
 	
 	private void resetViewLoadedLatch() {
@@ -636,6 +694,168 @@ public class MainController implements Initializable {
 	}
 	
 	/**
+	 * Show search results
+	 * @param result 
+	 */
+	public void showSearchResults(SearchResult result) {
+		
+		VBox root = (VBox) searchPopup.getScene().getRoot();
+		ObservableList<Node> resultsList = root.getChildren();
+		
+		// clear old results
+		resultsList.clear();
+		
+		// add new results
+		// artist
+		if (result.getArtistResults().size() > 0) {
+			
+			Label header = new Label("Artists");
+			resultsList.add(header);
+			VBox.setMargin(header, new Insets(10, 10, 10, 10));
+			
+			result.getArtistResults().forEach(artist -> {
+				
+				// artist cell
+				HBox cell = new HBox();
+                cell.setAlignment(Pos.CENTER_LEFT);
+                cell.setPrefWidth(226);
+                cell.setPrefHeight(50);
+				
+				// artist image
+                ImageView image = new ImageView();
+                image.setFitHeight(40);
+                image.setFitWidth(40);
+                //image.setImage(artist.getArtistImage());
+				
+				// artist title
+                Label label = new Label(artist.getTitle());
+                label.setTextOverrun(OverrunStyle.CLIP);
+                label.getStyleClass().setAll("searchLabel");
+				
+				// add to artist cell
+                cell.getChildren().addAll(image, label);
+				
+				// cell styles
+				HBox.setMargin(image, new Insets(5, 5, 5, 5));
+                HBox.setMargin(label, new Insets(10, 10, 10, 5));
+                cell.getStyleClass().add("searchResult");
+				
+				// cell clicked handler
+				cell.setOnMouseClicked(event -> {
+					
+				});
+				
+				resultsList.add(cell);
+			});
+			
+			// separator line
+			Separator separator = new Separator();
+            separator.setPrefWidth(206);
+            resultsList.add(separator);
+            VBox.setMargin(separator, new Insets(10, 10, 0, 10));
+		}
+		// album
+		if (result.getAlbumResults().size() > 0) {
+			
+			Label header = new Label("Albums");
+			resultsList.add(header);
+			VBox.setMargin(header, new Insets(10, 10, 10, 10));
+			
+			result.getAlbumResults().forEach(album -> {
+				
+				// album cell
+				HBox cell = new HBox();
+                cell.setAlignment(Pos.CENTER_LEFT);
+                cell.setPrefWidth(226);
+                cell.setPrefHeight(50);
+				
+				// album image
+                ImageView image = new ImageView();
+                image.setFitHeight(40);
+                image.setFitWidth(40);
+                //image.setImage(artist.getArtistImage());
+				
+				// album title
+                Label label = new Label(album.getTitle());
+                label.setTextOverrun(OverrunStyle.CLIP);
+                label.getStyleClass().setAll("searchLabel");
+				
+				// add to album cell
+                cell.getChildren().addAll(image, label);
+				
+				// cell styles
+				HBox.setMargin(image, new Insets(5, 5, 5, 5));
+                HBox.setMargin(label, new Insets(10, 10, 10, 5));
+                cell.getStyleClass().add("searchResult");
+				
+				// cell clicked handler
+				cell.setOnMouseClicked(event -> {
+					
+				});
+				
+				resultsList.add(cell);
+			});
+			
+			// separator line
+			Separator separator = new Separator();
+            separator.setPrefWidth(206);
+            resultsList.add(separator);
+            VBox.setMargin(separator, new Insets(10, 10, 0, 10));
+		}
+		// song
+		if (result.getSongResults().size() > 0) {
+			
+			Label header = new Label("Songs");
+			resultsList.add(header);
+			VBox.setMargin(header, new Insets(10, 10, 10, 10));
+			
+			result.getSongResults().forEach(song -> {
+				
+				// song cell
+				HBox cell = new HBox();
+                cell.setAlignment(Pos.CENTER_LEFT);
+                cell.setPrefWidth(226);
+                cell.setPrefHeight(50);
+				
+				// song title
+                Label label = new Label(song.getTitle());
+                label.setTextOverrun(OverrunStyle.CLIP);
+                label.getStyleClass().setAll("searchLabel");
+				
+				// add to song cell
+                cell.getChildren().add(label);
+				
+				// cell styles
+                HBox.setMargin(label, new Insets(10, 10, 10, 5));
+                cell.getStyleClass().add("searchResult");
+				
+				// cell clicked handler
+				cell.setOnMouseClicked(event -> {
+					
+				});
+				
+				resultsList.add(cell);
+			});
+		}
+		
+		// if there is no result
+		if (resultsList.isEmpty()) {
+			Label label = new Label("No Result");
+			resultsList.add(label);
+			VBox.setMargin(label, new Insets(10, 10, 10, 10));
+		}
+		
+		// show search result popup
+		if (!searchPopup.isShowing()) {
+            Stage stage = MusicPlayer.getStage();
+            searchPopup.setX(stage.getX() + 18);
+            searchPopup.setY(stage.getY() + 80);
+            searchPopup.show();
+            searchShowAnimation.play();
+        }
+	}
+	
+	/**
 	 * Animation
 	 */
 	private Animation collapseAnimation = new Transition() {
@@ -704,8 +924,9 @@ public class MainController implements Initializable {
 	
 	private Animation searchShowAnimation = new Transition() {
 		{
-			setCycleDuration(Duration.millis(250));
+			setCycleDuration(Duration.millis(50));
             setInterpolator(Interpolator.EASE_BOTH);
+			setOnFinished(x -> MusicPlayer.getStage().toFront());
 		}
 		@Override
 		protected void interpolate(double frac) {
@@ -715,7 +936,7 @@ public class MainController implements Initializable {
 		
 	private Animation searchHideAnimation = new Transition() {
 		{
-			setCycleDuration(Duration.millis(250));
+			setCycleDuration(Duration.millis(50));
             setInterpolator(Interpolator.EASE_BOTH);
 			setOnFinished(x -> searchPopup.hide());
 		}

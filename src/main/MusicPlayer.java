@@ -80,6 +80,11 @@ public class MusicPlayer extends Application {
 		MusicPlayer.stage.setTitle("Music Player");
 		Image musicPlayerIcon = new Image(this.getClass().getResource(Resources.IMG + "Icon.png").toString());
 		MusicPlayer.stage.getIcons().add(musicPlayerIcon);
+//		MusicPlayer.stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+//			if (!newValue) {
+//				MusicPlayer.stage.requestFocus();
+//			}
+//		});
 		MusicPlayer.stage.setOnCloseRequest(event -> {
 			Platform.exit();
 			System.exit(0);
