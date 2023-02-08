@@ -2,6 +2,8 @@ package model;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -9,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -234,6 +238,38 @@ public class Library {
 		}
 		
 		return i;
+	}
+	
+	/**
+	 * Delete library.xml if it exists
+	 */
+	public static void deleteLibraryXML() {
+		
+		// Specifies library.xml file and its location
+		File libraryXML = new File(Resources.JAR + "library.xml");
+		
+		// deletes if it exists
+//		try {
+//			Files.deleteIfExists(libraryXML.toPath());
+//		} catch (IOException e) {
+//		}
+		if (libraryXML.exists()) {
+			
+			libraryXML.delete();
+			
+			songs = null;
+			artists = null;
+			albums = null;
+			playlists = null;
+		}
+	}
+	
+	public static boolean checkLibraryXMLExists() {
+		
+		// Specifies library.xml file and its location
+		File libraryXML = new File(Resources.JAR + "library.xml");
+		
+		return libraryXML.exists();
 	}
 	
 	/**
