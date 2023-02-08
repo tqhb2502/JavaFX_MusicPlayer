@@ -566,6 +566,7 @@ public class MainController implements Initializable {
 	
 	private void initializePlaylists() {
     	for (Playlist playlist : Library.getPlaylists()) {
+			if(playlist.getTitle().equals("Default")) continue;
     		try {
     			FXMLLoader loader = new FXMLLoader(this.getClass().getResource(Resources.FXML + "PlaylistCell.fxml"));
 				HBox cell = loader.load();

@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamReader;
 import model.Album;
 import model.Artist;
 import model.Library;
+import model.Playlist;
 import model.Song;
 import util.Resources;
 import util.XMLEditor;
@@ -104,7 +105,7 @@ public class MusicPlayer extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+				
 		Thread thread = new Thread(() -> {
 			
 			// retrieves songs, albums, artists, playlists data and stores to Library
@@ -112,14 +113,29 @@ public class MusicPlayer extends Application {
 			Library.getAlbums();
 			Library.getArtists();
 			// get playlists
+			int check = 0;
+			for(Playlist playlist: Library.getPlaylists()) {
+				if(playlist.getTitle().equals("Default")) {
+					check = 1;
+					break;
+				}
+			}
+			if(check == 0) {
+				Library.addPlaylist("Default"); 
+				Playlist Default = Library.getPlaylist("Default");
+				Library.getSongs().forEach(song -> {
+					Default.addSong(song);
+//					Library.addSongToPlaylist("Default", song);
+				});
+			}
 			Library.getPlaylists();
 			
 			// retrieves playing list
 			nowPlayingList = Library.loadPlayingList();
+			nowPlayingList.addAll(Library.getPlaylist("Default").getSongs());
 			
 			// if now playing list is empty, set it with the songs of first artist in artists list
-			if (nowPlayingList.isEmpty()) {
-				
+//			if (nowPlayingList.isEmpty()) {
 //				Artist artist = Library.getArtists().get(0);
 //				
 //				for (Album album : artist.getAlbums()) {
@@ -135,9 +151,9 @@ public class MusicPlayer extends Application {
 //						return first.compareTo(second);
 //					}
 //				});
-
-				nowPlayingList.addAll(Library.getSongs());
-			}
+//
+//				nowPlayingList.addAll(Library.getSongs());
+//			}
 			
 			nowPlaying = nowPlayingList.get(0);
 			nowPlayingIndex = 0;
