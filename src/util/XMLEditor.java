@@ -322,6 +322,8 @@ public class XMLEditor {
 
 	            // Adds the new song to the songsToAdd array list.
 	            songsToAdd.add(newSong);
+			} catch (NullPointerException npe) {
+				continue;
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

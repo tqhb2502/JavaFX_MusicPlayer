@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package controller;
 
 import java.net.URL;
@@ -15,12 +11,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import model.Song;
 
-/**
- * FXML Controller class
- *
- * @author huytq
- */
 public class AlbumsController implements Initializable {
 
 	@FXML
@@ -38,15 +30,15 @@ public class AlbumsController implements Initializable {
 	@FXML
 	private Label albumLabel;
 	@FXML
-	private TableView<?> songTable;
+	private TableView<Song> songTable;
 	@FXML
-	private TableColumn<?, ?> playingColumn;
+	private TableColumn<Song, Boolean> playingColumn;
 	@FXML
-	private TableColumn<?, ?> titleColumn;
+	private TableColumn<Song, String> titleColumn;
 	@FXML
-	private TableColumn<?, ?> lengthColumn;
+	private TableColumn<Song, String> lengthColumn;
 	@FXML
-	private TableColumn<?, ?> playsColumn;
+	private TableColumn<Song, Integer> playsColumn;
 
 	/**
 	 * Initializes the controller class.

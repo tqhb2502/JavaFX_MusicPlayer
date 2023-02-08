@@ -117,26 +117,28 @@ public class MusicPlayer extends Application {
 		Library.getAlbums();
 		Library.getArtists();
 		// get playlists
-    int check = 0;
-    for(Playlist playlist: Library.getPlaylists()) {
-      if(playlist.getTitle().equals("Default")) {
-        check = 1;
-        break;
-      }
-    }
-    if(check == 0) {
-      Library.addPlaylist("Default"); 
-      Playlist Default = Library.getPlaylist("Default");
-      Library.getSongs().forEach(song -> {
-        Default.addSong(song);
-//					Library.addSongToPlaylist("Default", song);
-      });
-    }
+		int check = 0;
+		for(Playlist playlist: Library.getPlaylists()) {
+		  if(playlist.getTitle().equals("Default")) {
+			check = 1;
+			break;
+		  }
+		}
+		if(check == 0) {
+		  Library.addPlaylist("Default"); 
+		  Playlist Default = Library.getPlaylist("Default");
+		  Library.getSongs().forEach(song -> {
+			Default.addSong(song);
+	//					Library.addSongToPlaylist("Default", song);
+		  });
+		}
 		Library.getPlaylists();
 
 		// retrieves playing list
 		nowPlayingList = Library.loadPlayingList();
-	  nowPlayingList.addAll(Library.getPlaylist("Default").getSongs());
+		if (nowPlayingList.isEmpty()) {
+			nowPlayingList.addAll(Library.getPlaylist("Default").getSongs());
+		}
 
 		nowPlaying = nowPlayingList.get(0);
 		nowPlayingIndex = 0;

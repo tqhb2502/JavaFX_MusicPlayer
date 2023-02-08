@@ -119,6 +119,14 @@ public class MainController implements Initializable {
 	private Separator letterSeparator;
 	@FXML
 	private ScrollPane subViewRoot;
+	@FXML
+	private HBox artistsHBox;
+	@FXML
+	private HBox albumsHBox;
+	@FXML
+	private HBox songsHBox;
+	@FXML
+	private HBox playingHBox;
 	
 	private SubView subViewController;
 
@@ -421,6 +429,7 @@ public class MainController implements Initializable {
 	@FXML
 	private void reimportMusic() {
 		MusicPlayer.createLibraryXML();
+		MusicPlayer.getNowPlayingList().clear();
 		Thread thread = new Thread(MusicPlayer::prepareAndShowMain);
 		thread.start();
 	}
@@ -447,12 +456,17 @@ public class MainController implements Initializable {
 		}
 
 		ObservableList<String> styles = eventSource.getStyleClass();
-		System.out.println("load view " + eventSource.getId());
+		String viewName = eventSource.getId();
+		viewName = viewName.substring(0, 1).toUpperCase() + viewName.substring(1);
+		setStyleAndLoad(viewName, styles);
+	}
+	
+	public void setStyleAndLoad(String viewName, ObservableList<String> styles) {
 		if (styles.get(0).equals("sideBarItem")) {
 			styles.setAll("sideBarItemSelected");
-			loadView(eventSource.getId());
+			loadView(viewName);
 		} else if (styles.get(0).equals("bottomBarItem")) {
-			loadView(eventSource.getId());
+			loadView(viewName);
 		}
 	}
 	
@@ -460,6 +474,7 @@ public class MainController implements Initializable {
 		try {
 			String fileName = Resources.FXML + viewName + ".fxml";
 			
+			System.out.println("Loading view " + fileName);
 			FXMLLoader loader = new FXMLLoader(this.getClass().getResource(fileName));
 			Node view = loader.load();
             
@@ -599,7 +614,7 @@ public class MainController implements Initializable {
 
 	@FXML
     private void newPlaylist() {
-    	System.out.println("New playlist");
+    	System.out.println("Create new playlist");
 		if (!newPlaylistAnimation.getStatus().equals(Status.RUNNING)) 
 		try {
 
@@ -972,5 +987,21 @@ public class MainController implements Initializable {
 
 	public VBox getPlaylistBox() {
 		return playlistBox;
+	}
+
+	public HBox getArtistsHBox() {
+		return artistsHBox;
+	}
+
+	public HBox getAlbumsHBox() {
+		return albumsHBox;
+	}
+
+	public HBox getSongsHBox() {
+		return songsHBox;
+	}
+
+	public HBox getPlayingHBox() {
+		return playingHBox;
 	}
 }
