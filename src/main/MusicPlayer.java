@@ -105,21 +105,25 @@ public class MusicPlayer extends Application {
 			e.printStackTrace();
 		}
 		
-		Thread thread = new Thread(() -> {
-			
-			// retrieves songs, albums, artists, playlists data and stores to Library
-			Library.getSongs();
-			Library.getAlbums();
-			Library.getArtists();
-			// get playlists
-			Library.getPlaylists();
-			
-			// retrieves playing list
-			nowPlayingList = Library.loadPlayingList();
-			
-			// if now playing list is empty, set it with the songs of first artist in artists list
-			if (nowPlayingList.isEmpty()) {
-				
+		Thread thread = new Thread(MusicPlayer::prepareAndShowMain);
+		thread.start();
+	}
+	
+	public static void prepareAndShowMain() {
+		
+		// retrieves songs, albums, artists, playlists data and stores to Library
+		Library.getSongs();
+		Library.getAlbums();
+		Library.getArtists();
+		// get playlists
+		Library.getPlaylists();
+
+		// retrieves playing list
+		nowPlayingList = Library.loadPlayingList();
+
+		// if now playing list is empty, set it with the songs of first artist in artists list
+		if (nowPlayingList.isEmpty()) {
+
 //				Artist artist = Library.getArtists().get(0);
 //				
 //				for (Album album : artist.getAlbums()) {
@@ -136,30 +140,27 @@ public class MusicPlayer extends Application {
 //					}
 //				});
 
-				nowPlayingList.addAll(Library.getSongs());
-			}
-			
-			nowPlaying = nowPlayingList.get(0);
-			nowPlayingIndex = 0;
-			nowPlaying.setPlaying(true);
-			
-			timer = new Timer();
-            timerCounter = 0;
-            secondsPlayed = 0;
-			
-			String path = nowPlaying.getLocation();
-			Media media = new Media(Paths.get(path).toUri().toString());
-			mediaPlayer = new MediaPlayer(media);
-			mediaPlayer.setVolume(0.5);
-			mediaPlayer.setOnEndOfMedia(new SongSkipper());
-			
-			// download image
-			
-			// Calls the function to initialize the main layout.
-            Platform.runLater(this::initMain);
-		});
-		
-		thread.start();
+			nowPlayingList.addAll(Library.getSongs());
+		}
+
+		nowPlaying = nowPlayingList.get(0);
+		nowPlayingIndex = 0;
+		nowPlaying.setPlaying(true);
+
+		timer = new Timer();
+		timerCounter = 0;
+		secondsPlayed = 0;
+
+		String path = nowPlaying.getLocation();
+		Media media = new Media(Paths.get(path).toUri().toString());
+		mediaPlayer = new MediaPlayer(media);
+		mediaPlayer.setVolume(0.5);
+		mediaPlayer.setOnEndOfMedia(new SongSkipper());
+
+		// download image
+
+		// Calls the function to initialize the main layout.
+		Platform.runLater(MusicPlayer::initMain);
 	}
 	
 	private static void checkLibraryXML() {
@@ -318,7 +319,7 @@ public class MusicPlayer extends Application {
 	}
 	
 	/**
-	 * Update library.xml
+	 * Update library.xml when songs are added or deleted
 	 * @param musicDirectory path of music directory
 	 */
 	private static void updateLibraryXML(Path musicDirectory) {
@@ -330,10 +331,10 @@ public class MusicPlayer extends Application {
         XMLEditor.addDeleteChecker();
 	}
 	
-	private static void createLibraryXML() {
+	public static void createLibraryXML() {
 		try {
 			
-			// load import view
+			// load import dialog
 			FXMLLoader loader = new FXMLLoader(MusicPlayer.class.getResource(Resources.FXML + "ImportMusicDialog.fxml"));
 			Parent view = loader.load();
 			
@@ -355,6 +356,11 @@ public class MusicPlayer extends Application {
 			ImportMusicDialogController controller = loader.getController();
 			controller.setDialogStage(dialogStage);
 			
+			// set this so that Music Player will not close when user decide to not re-import
+			if (Library.checkLibraryXMLExists()) {
+				controller.setMusicImported(true);
+			}
+			
 			// Show the dialog and wait until the user closes it.
             dialogStage.showAndWait();
 			
@@ -369,11 +375,11 @@ public class MusicPlayer extends Application {
 		}
 	}
 	
-	private void initMain() {
+	private static void initMain() {
 		try {
 			
 			// load main layout
-			FXMLLoader loader = new FXMLLoader(this.getClass().getResource(Resources.FXML + "Main.fxml"));
+			FXMLLoader loader = new FXMLLoader(MusicPlayer.class.getResource(Resources.FXML + "Main.fxml"));
 			BorderPane view = loader.load();
 			
 			// show scene containing main layout

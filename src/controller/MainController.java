@@ -246,7 +246,7 @@ public class MainController implements Initializable {
 		initializePlaylists();
 		
 		// loads default sub view
-		loadView("songs");
+		loadView("Songs");
 	}
 	
 	private void resetViewLoadedLatch() {
@@ -416,6 +416,13 @@ public class MainController implements Initializable {
 		} else {
 			controlBox.getChildren().add(1, playButton);
 		}
+	}
+	
+	@FXML
+	private void reimportMusic() {
+		MusicPlayer.createLibraryXML();
+		Thread thread = new Thread(MusicPlayer::prepareAndShowMain);
+		thread.start();
 	}
 	
 	@FXML

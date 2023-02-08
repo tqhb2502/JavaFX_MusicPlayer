@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package controller;
 
 import java.net.URL;
@@ -17,11 +13,6 @@ import javafx.stage.Stage;
 import model.Library;
 import util.ImportMusicTask;
 
-/**
- * FXML Controller class
- *
- * @author huytq
- */
 public class ImportMusicDialogController implements Initializable {
 
 	@FXML
@@ -41,6 +32,10 @@ public class ImportMusicDialogController implements Initializable {
 	public void initialize(URL url, ResourceBundle rb) {
 		// TODO
 	}	
+	
+	public void setMusicImported(boolean musicImported) {
+		this.musicImported = musicImported;
+	}
 	
 	public void setDialogStage(Stage dialogStage) {
 		this.dialogStage = dialogStage;
@@ -66,6 +61,8 @@ public class ImportMusicDialogController implements Initializable {
 				protected Boolean call() throws Exception {
 					
 					try {
+						musicImported = false;
+						Library.deleteLibraryXML();
 						Library.importMusic(musicDirectory, this);
 						return true;
 					} catch (Exception e) {
@@ -98,6 +95,8 @@ public class ImportMusicDialogController implements Initializable {
 	        // This happens as soon as the music import task is started.
         	importMusicButton.setVisible(false);
 		    progressBar.setVisible(true);
+			
+		} catch (NullPointerException npe) {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
