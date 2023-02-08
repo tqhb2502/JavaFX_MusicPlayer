@@ -85,7 +85,7 @@ public class SongsController implements Initializable, SubView {
 			event.consume();
 		});
 		
-		ObservableList<Song> songs = Library.getSongs();
+		ObservableList<Song> songs = Library.getPlaylist("Default").getSongs();
 		
 		Collections.sort(songs, (x, y) -> compareSongs(x, y));
 		
@@ -228,15 +228,15 @@ public class SongsController implements Initializable, SubView {
 	
 	@Override
 	public void play() {
-		System.out.println("play");
 		Song song = selectedSong;
-//		ObservableList<Song> songList = tableView.getItems();
-//		if(MusicPlayer.isShuffleActive()) {
-//			Collections.shuffle(songList);
-//			songList.remove(song);
-//			songList.add(0, song);
-//		}
-//		MusicPlayer.setNowPlayingList((ArrayList<Song>) songList);
+//		System.out.println("In song, play: " + selectedSong.getTitle());
+		ObservableList<Song> songList = tableView.getItems();
+		if(MusicPlayer.isShuffleActive()) {
+			Collections.shuffle(songList);
+			songList.remove(song);
+			songList.add(0, song);
+		}
+		MusicPlayer.setNowPlayingList(songList);
 		MusicPlayer.setNowPlaying(song);
 		MusicPlayer.play();
 	}

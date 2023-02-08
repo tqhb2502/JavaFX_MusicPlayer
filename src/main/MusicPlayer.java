@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamReader;
 import model.Album;
 import model.Artist;
 import model.Library;
+import model.Playlist;
 import model.Song;
 import util.Resources;
 import util.XMLEditor;
@@ -116,32 +117,26 @@ public class MusicPlayer extends Application {
 		Library.getAlbums();
 		Library.getArtists();
 		// get playlists
+    int check = 0;
+    for(Playlist playlist: Library.getPlaylists()) {
+      if(playlist.getTitle().equals("Default")) {
+        check = 1;
+        break;
+      }
+    }
+    if(check == 0) {
+      Library.addPlaylist("Default"); 
+      Playlist Default = Library.getPlaylist("Default");
+      Library.getSongs().forEach(song -> {
+        Default.addSong(song);
+//					Library.addSongToPlaylist("Default", song);
+      });
+    }
 		Library.getPlaylists();
 
 		// retrieves playing list
 		nowPlayingList = Library.loadPlayingList();
-
-		// if now playing list is empty, set it with the songs of first artist in artists list
-		if (nowPlayingList.isEmpty()) {
-
-//				Artist artist = Library.getArtists().get(0);
-//				
-//				for (Album album : artist.getAlbums()) {
-//					nowPlayingList.addAll(album.getSongs());
-//				}
-//				
-//				Collections.sort(nowPlayingList, (first, second) -> {
-//					Album firstAlbum = Library.getAlbum(first.getAlbum());
-//                    Album secondAlbum = Library.getAlbum(second.getAlbum());
-//					if (firstAlbum.compareTo(secondAlbum) != 0) {
-//						return firstAlbum.compareTo(secondAlbum);
-//					} else {
-//						return first.compareTo(second);
-//					}
-//				});
-
-			nowPlayingList.addAll(Library.getSongs());
-		}
+	  nowPlayingList.addAll(Library.getPlaylist("Default").getSongs());
 
 		nowPlaying = nowPlayingList.get(0);
 		nowPlayingIndex = 0;

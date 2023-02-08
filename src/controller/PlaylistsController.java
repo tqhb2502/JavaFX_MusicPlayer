@@ -231,6 +231,8 @@ public class PlaylistsController implements Initializable, SubView {
 	@Override
 	public void play() {
 		Song song = selectedSong;
+//		System.out.println("In " + selectedPlaylist.getTitle());
+//		System.out.println("play: " + song.getTitle());
         ObservableList<Song> songs = selectedPlaylist.getSongs();
         if (MusicPlayer.isShuffleActive()) {
             Collections.shuffle(songs);

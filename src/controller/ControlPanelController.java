@@ -63,6 +63,7 @@ public class ControlPanelController implements Initializable {
 	@FXML
 	private void playSong(MouseEvent event) {
 		SubView controller = MusicPlayer.getMainController().getSubViewController();
+		System.out.println(controller.getClass());
 		controller.play();
 		event.consume();
 		
@@ -82,6 +83,7 @@ public class ControlPanelController implements Initializable {
 		ObservableList<String> playlistTitles = FXCollections.observableArrayList();
 		for (Playlist playlist : playlists) {
 			String title = playlist.getTitle();
+			if(title.equals("Default")) continue;
 			playlistTitles.add(title);
 			
 		}

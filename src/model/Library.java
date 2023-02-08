@@ -589,8 +589,14 @@ public class Library {
         });
 
         thread.start();
+		
+		if(text.equals("Default")) try {
+			thread.join();
+		} catch (InterruptedException ex) {
+			Logger.getLogger(Library.class.getName()).log(Level.SEVERE, null, ex);
+		}
     }
-
+	
     public static void removePlaylist(Playlist playlist) {
         playlists.remove(playlist);
     }
