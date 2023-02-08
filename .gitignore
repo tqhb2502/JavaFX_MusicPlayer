@@ -4,3 +4,4 @@ test
 build.xml
 manifest.mf
 /src/resource/song
+/song
