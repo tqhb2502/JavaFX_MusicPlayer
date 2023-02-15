@@ -181,7 +181,6 @@ public class NowPlayingController implements Initializable, SubView {
 	
 	@Override
     public void play() {
-    	System.out.println("Played");
     	Song song = selectedSong;
         ObservableList<Song> songList = tableView.getItems();
         if (MusicPlayer.isShuffleActive()) {

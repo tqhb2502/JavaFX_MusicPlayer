@@ -117,33 +117,33 @@ public class MusicPlayer extends Application {
 		Library.getAlbums();
 		Library.getArtists();
 		// get playlists
-		int check = 0;
-		for(Playlist playlist: Library.getPlaylists()) {
-		  if(playlist.getTitle().equals("Default")) {
-			check = 1;
-			break;
-		  }
-		}
-		if(check == 0) {
-		  Library.addPlaylist("Default"); 
-		  Playlist Default = Library.getPlaylist("Default");
-		  Library.getSongs().forEach(song -> {
-			Default.addSong(song);
-	//					Library.addSongToPlaylist("Default", song);
-		  });
-		}
+//		int check = 0;
+//		for(Playlist playlist: Library.getPlaylists()) {
+//		  if(playlist.getTitle().equals("Default")) {
+//			check = 1;
+//			break;
+//		  }
+//		}
+//		if(check == 0) {
+//		  Library.addPlaylist("Default"); 
+//		  Playlist Default = Library.getPlaylist("Default");
+//		  Library.getSongs().forEach(song -> {
+//			Default.addSong(song);
+//	//					Library.addSongToPlaylist("Default", song);
+//		  });
+//		}
 		Library.getPlaylists();
 
 		// retrieves playing list
 		nowPlayingList = Library.loadPlayingList();
 		if (nowPlayingList.isEmpty()) {
-			nowPlayingList.addAll(Library.getPlaylist("Default").getSongs());
+			nowPlayingList.addAll(Library.getSongs());
 		}
-
+		
 		nowPlaying = nowPlayingList.get(0);
 		nowPlayingIndex = 0;
 		nowPlaying.setPlaying(true);
-
+		
 		timer = new Timer();
 		timerCounter = 0;
 		secondsPlayed = 0;
@@ -255,7 +255,7 @@ public class MusicPlayer extends Application {
 	 * Determine the number of music files stored in library.xml
 	 * @return the number of music files
 	 */
-	private static int xmlMusicDirFileNumFinder() {
+	public static int xmlMusicDirFileNumFinder() {
 		try {
 			
 			// create xml reader

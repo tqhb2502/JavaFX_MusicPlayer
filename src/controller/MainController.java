@@ -429,6 +429,7 @@ public class MainController implements Initializable {
 	@FXML
 	private void reimportMusic() {
 		MusicPlayer.createLibraryXML();
+		MusicPlayer.setXMLFileNum(MusicPlayer.xmlMusicDirFileNumFinder());
 		MusicPlayer.getNowPlayingList().clear();
 		Thread thread = new Thread(MusicPlayer::prepareAndShowMain);
 		thread.start();
@@ -472,14 +473,16 @@ public class MainController implements Initializable {
 	
 	public SubView loadView(String viewName) {
 		try {
-			String fileName = Resources.FXML + viewName + ".fxml";
 			
+			// load the targeted view
+			String fileName = Resources.FXML + viewName + ".fxml";
 			System.out.println("Loading view " + fileName);
 			FXMLLoader loader = new FXMLLoader(this.getClass().getResource(fileName));
 			Node view = loader.load();
             
 			CountDownLatch latch = new CountDownLatch(1);
             
+			// prepare task for load the view
 			Task<Void> task = new Task<Void>() {
 				protected Void call() throws Exception {
 					Platform.runLater(() -> {
@@ -507,6 +510,7 @@ public class MainController implements Initializable {
 
 			Thread thread = new Thread(task);
 
+			// set time when the loadview task starts
 			unloadViewAnimation.setOnFinished(x -> thread.start());
 
 			loadViewAnimation.setOnFinished(x -> viewLoadedLatch.countDown());
@@ -588,7 +592,7 @@ public class MainController implements Initializable {
 	
 	private void initializePlaylists() {
     	for (Playlist playlist : Library.getPlaylists()) {
-			if(playlist.getTitle().equals("Default")) continue;
+//			if(playlist.getTitle().equals("Default")) continue;
     		try {
     			FXMLLoader loader = new FXMLLoader(this.getClass().getResource(Resources.FXML + "PlaylistCell.fxml"));
 				HBox cell = loader.load();
