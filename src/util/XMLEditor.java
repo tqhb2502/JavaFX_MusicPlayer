@@ -98,15 +98,15 @@ public class XMLEditor {
 		// Finds the song titles in the music directory and stores them in the librarySongs array list.
 		musicDirFileFinder(new File(musicDirectory));
 		
-		System.out.println("-----------------------------------------");
-		for (String xmlSongFileName : xmlSongsFileNames) {
-			System.out.println(xmlSongFileName);
-		}
-		System.out.println("-----------------------------------------");
-		for (String songFileName : musicDirFileNames) {
-			System.out.println(songFileName);
-		}
-		System.out.println("-----------------------------------------");
+//		System.out.println("-----------------------------------------");
+//		for (String xmlSongFileName : xmlSongsFileNames) {
+//			System.out.println(xmlSongFileName);
+//		}
+//		System.out.println("-----------------------------------------");
+//		for (String songFileName : musicDirFileNames) {
+//			System.out.println(songFileName);
+//		}
+//		System.out.println("-----------------------------------------");
 							
 		// Initializes a counter variable to index the musicDirFiles array to get the file
 		// corresponding to the song that needs to be added to the xml file.
@@ -151,7 +151,6 @@ public class XMLEditor {
 			// Deletes song from library xml file.
 			deleteSongFromXML();
 		}
-		
 	}
 	
 	private static void xmlSongsFilePathFinder() {
@@ -512,7 +511,7 @@ public class XMLEditor {
 			// Closes xml reader.
 			reader.close();
 			
-			// Converts the file number to an int and returns the value. 
+			// Converts the file number to an int and returns the value.
 			return Integer.parseInt(xmlNewLastIdAssigned);
 		} catch (Exception e) {
 			e.printStackTrace();
