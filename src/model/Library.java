@@ -325,13 +325,24 @@ public class Library {
 		return FXCollections.observableArrayList(songs);
 	}
 	
+	public static void resetSongs() {
+		songs = null;
+	}
+	
 	public static Song getSong(int id) {
 		
 		if (songs == null) {
             getSongs();
         }
 		
-        return songs.get(id);
+		for (Song song : songs) {
+			
+			if (song.getId() == id) {
+				return song;
+			}
+		}
+		
+        return null;
 	}
 	
 	public static Song getSong(String title) {
@@ -460,6 +471,10 @@ public class Library {
 		return FXCollections.observableArrayList(albums);
 	}
 	
+	public static void resetAlbums() {
+		albums = null;
+	}
+	
 	public static Album getAlbum(String title) {
 		
 		if (albums == null) {
@@ -525,6 +540,10 @@ public class Library {
 		}
 		
 		return FXCollections.observableArrayList(artists);
+	}
+	
+	public static void resetArtists() {
+		artists = null;
 	}
 	
 	public static Artist getArtist(String title) {
@@ -693,6 +712,10 @@ public class Library {
         return FXCollections.observableArrayList(playlists);
     }
 	
+	public static void resetPlaylists() {
+		playlists = null;
+	}
+	
 	public static Playlist getPlaylist(int id) {
         if (playlists == null) {
             getPlaylists();
@@ -738,7 +761,8 @@ public class Library {
 					
 					String value = reader.getText();
 					if (element.equals(ID)) {
-						nowPlayingList.add(getSong(Integer.parseInt(value)));
+						Song song = getSong(Integer.parseInt(value));
+						if (song != null) nowPlayingList.add(song);
 					}
 				} else if (reader.isStartElement()) {
 					

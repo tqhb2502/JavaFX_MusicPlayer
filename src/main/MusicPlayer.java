@@ -116,22 +116,6 @@ public class MusicPlayer extends Application {
 		Library.getSongs();
 		Library.getAlbums();
 		Library.getArtists();
-		// get playlists
-//		int check = 0;
-//		for(Playlist playlist: Library.getPlaylists()) {
-//		  if(playlist.getTitle().equals("Default")) {
-//			check = 1;
-//			break;
-//		  }
-//		}
-//		if(check == 0) {
-//		  Library.addPlaylist("Default"); 
-//		  Playlist Default = Library.getPlaylist("Default");
-//		  Library.getSongs().forEach(song -> {
-//			Default.addSong(song);
-//	//					Library.addSongToPlaylist("Default", song);
-//		  });
-//		}
 		Library.getPlaylists();
 
 		// retrieves playing list
@@ -140,6 +124,7 @@ public class MusicPlayer extends Application {
 			nowPlayingList.addAll(Library.getSongs());
 		}
 		
+		System.out.println("nowPlayingList size: " + nowPlayingList.size());
 		nowPlaying = nowPlayingList.get(0);
 		nowPlayingIndex = 0;
 		nowPlaying.setPlaying(true);
@@ -160,7 +145,7 @@ public class MusicPlayer extends Application {
 		Platform.runLater(MusicPlayer::initMain);
 	}
 	
-	private static void checkLibraryXML() {
+	public static void checkLibraryXML() {
 		
 		// Finds the jar file and the path of its parent folder.
         File musicPlayerJAR = null;
@@ -213,7 +198,7 @@ public class MusicPlayer extends Application {
 	 * Find music directory path stored in XML file
 	 * @return path of music directory
 	 */
-	private static Path xmlMusicDirPathFinder() {
+	public static Path xmlMusicDirPathFinder() {
 		try {
 			
 			// create xml reader
@@ -299,7 +284,7 @@ public class MusicPlayer extends Application {
 	 * @param i current number of files
 	 * @return the number of music files in directory
 	 */
-	private static int musicDirFileNumFinder(File musicDirectory, int i) {
+	public static int musicDirFileNumFinder(File musicDirectory, int i) {
 		
 		File[] files = musicDirectory.listFiles();
 		
@@ -319,7 +304,7 @@ public class MusicPlayer extends Application {
 	 * Update library.xml when songs are added or deleted
 	 * @param musicDirectory path of music directory
 	 */
-	private static void updateLibraryXML(Path musicDirectory) {
+	public static void updateLibraryXML(Path musicDirectory) {
 		// Sets the music directory for the XMLEditor.
         XMLEditor.setMusicDirectory(musicDirectory);
 
