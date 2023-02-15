@@ -45,6 +45,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import main.MusicPlayer;
+import model.Album;
+import model.Artist;
 import model.Library;
 import model.Playlist;
 import model.SearchResult;
@@ -786,7 +788,10 @@ public class MainController implements Initializable {
 				
 				// cell clicked handler
 				cell.setOnMouseClicked(event -> {
-					
+					ArtistsMainController artistsMainController = (ArtistsMainController) loadView("ArtistsMain");
+					artistsMainController.selectArtist(artist);
+					searchBox.setText("");
+					sideBar.requestFocus();
 				});
 				
 				resultsList.add(cell);
@@ -834,7 +839,12 @@ public class MainController implements Initializable {
 				
 				// cell clicked handler
 				cell.setOnMouseClicked(event -> {
-					
+					Artist artist = Library.getArtist(album.getArtist());
+					ArtistsMainController artistsMainController = (ArtistsMainController) loadView("ArtistsMain");
+					artistsMainController.selectArtist(artist);
+					artistsMainController.selectAlbum(album);
+					searchBox.setText("");
+					sideBar.requestFocus();
 				});
 				
 				resultsList.add(cell);
@@ -875,7 +885,14 @@ public class MainController implements Initializable {
 				
 				// cell clicked handler
 				cell.setOnMouseClicked(event -> {
-					
+					Artist artist = Library.getArtist(song.getArtist());
+					Album album = artist.getAlbums().stream().filter(x -> x.getTitle().equals(song.getAlbum())).findFirst().get();
+					ArtistsMainController artistsMainController = (ArtistsMainController) loadView("ArtistsMain");
+					artistsMainController.selectArtist(artist);
+					artistsMainController.selectAlbum(album);
+					artistsMainController.selectSong(song);
+					searchBox.setText("");
+					sideBar.requestFocus();
 				});
 				
 				resultsList.add(cell);
