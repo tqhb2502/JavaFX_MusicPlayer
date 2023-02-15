@@ -110,6 +110,16 @@ public class MusicPlayer extends Application {
 		thread.start();
 	}
 	
+	public static void resetMediaPlayer() {
+		// pause current playing song
+		pause();
+		// reset media player
+		nowPlaying = null;
+		mediaPlayer = null;
+		// clear now playing list
+		nowPlayingList.clear();
+	}
+	
 	public static void prepareAndShowMain() {
 		
 		// retrieves songs, albums, artists, playlists data and stores to Library
@@ -126,7 +136,7 @@ public class MusicPlayer extends Application {
 		
 		System.out.println("nowPlayingList size: " + nowPlayingList.size());
 		
-		if (nowPlayingList.size() > 0) {
+		if (!nowPlayingList.isEmpty()) {
 			nowPlaying = nowPlayingList.get(0);
 			nowPlayingIndex = 0;
 			nowPlaying.setPlaying(true);
@@ -140,6 +150,8 @@ public class MusicPlayer extends Application {
 			mediaPlayer = new MediaPlayer(media);
 			mediaPlayer.setVolume(0.5);
 			mediaPlayer.setOnEndOfMedia(new SongSkipper());
+		} else {
+			resetMediaPlayer();
 		}
 
 		// download image

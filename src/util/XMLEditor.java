@@ -512,7 +512,11 @@ public class XMLEditor {
 			reader.close();
 			
 			// Converts the file number to an int and returns the value.
-			return Integer.parseInt(xmlNewLastIdAssigned);
+			if (xmlNewLastIdAssigned != null) {
+				return Integer.parseInt(xmlNewLastIdAssigned);
+			} else {
+				return 0;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return 0;

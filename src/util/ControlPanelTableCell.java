@@ -43,13 +43,13 @@ public class ControlPanelTableCell<S, T> extends TableCell<S, T>{
 			song.selectedProperty().removeListener(listener);
 			song.selectedProperty().addListener(listener);
 		} else {
-			String fileName = Resources.FXML + "ControlPanel.fxml";
-//			 Selects the correct control panel based on whether the user is in a play list or not.
-//			if (MusicPlayer.getMainController().getSubViewController() instanceof PlaylistsController) {
-//				fileName = Resources.FXML + "ControlPanelPlaylists.fxml";
-//			} else {
-//				fileName = Resources.FXML + "ControlPanel.fxml";
-//			}
+			String fileName;
+			// Selects the correct control panel based on whether the user is in a play list or not.
+			if (MusicPlayer.getMainController().getSubViewController() instanceof PlaylistsController) {
+				fileName = Resources.FXML + "ControlPanelPlaylists.fxml";
+			} else {
+				fileName = Resources.FXML + "ControlPanel.fxml";
+			}
 			try {
 				Label text = new Label(item.toString());
 				text.setTextOverrun(OverrunStyle.CLIP);
