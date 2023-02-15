@@ -114,10 +114,6 @@ public class MainController implements Initializable {
 	@FXML
 	private Pane volumeButton;
 	@FXML
-	private HBox letterBox;
-	@FXML
-	private Separator letterSeparator;
-	@FXML
 	private ScrollPane subViewRoot;
 	@FXML
 	private HBox artistsHBox;
@@ -431,6 +427,17 @@ public class MainController implements Initializable {
 		MusicPlayer.createLibraryXML();
 		MusicPlayer.setXMLFileNum(MusicPlayer.xmlMusicDirFileNumFinder());
 		MusicPlayer.getNowPlayingList().clear();
+		Thread thread = new Thread(MusicPlayer::prepareAndShowMain);
+		thread.start();
+	}
+	
+	@FXML
+	private void refreshMusicPlayer() {
+		MusicPlayer.checkLibraryXML();
+		Library.resetSongs();
+		Library.resetAlbums();
+		Library.resetArtists();
+		Library.resetPlaylists();
 		Thread thread = new Thread(MusicPlayer::prepareAndShowMain);
 		thread.start();
 	}

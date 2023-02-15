@@ -66,13 +66,31 @@ public class XMLEditor {
 	private static boolean addSongs;
 	private static boolean deleteSongs;
 
-	public static ArrayList<Song> getNewSongs() { return songsToAdd; }
+	public static ArrayList<Song> getNewSongs() {
+		return songsToAdd;
+	}
 
 	public static void setMusicDirectory(Path musicDirectoryPath) {
 		musicDirectory = musicDirectoryPath.toString();
 	}
+	
+	public static void resetData() {
+		xmlSongsFileNames = new ArrayList<>();
+		xmlSongsFilePaths = new ArrayList<>();
+		musicDirFileNames = new ArrayList<>();
+		musicDirFiles = new ArrayList<>();
+		songFilesToAdd = new ArrayList<>();
+		songPathsToDelete = new ArrayList<>();
+		songsToAdd = new ArrayList<>();
+		addSongs = false;
+		deleteSongs = false;
+	}
 
 	public static void addDeleteChecker() {
+		
+		// reset data from previous check
+		resetData();
+		
 		// Finds the file name of the songs in the library xml file and
 		// stores them in the xmlSongsFileNames array list.
 		xmlSongsFilePathFinder();
@@ -80,13 +98,15 @@ public class XMLEditor {
 		// Finds the song titles in the music directory and stores them in the librarySongs array list.
 		musicDirFileFinder(new File(musicDirectory));
 		
-//		for (String xmlSongFileName : xmlSongsFileNames) {
-//			System.out.println(xmlSongFileName);
-//		}
-//		System.out.println("-----------------------------------------");
-//		for (String songFileName : musicDirFileNames) {
-//			System.out.println(songFileName);
-//		}
+		System.out.println("-----------------------------------------");
+		for (String xmlSongFileName : xmlSongsFileNames) {
+			System.out.println(xmlSongFileName);
+		}
+		System.out.println("-----------------------------------------");
+		for (String songFileName : musicDirFileNames) {
+			System.out.println(songFileName);
+		}
+		System.out.println("-----------------------------------------");
 							
 		// Initializes a counter variable to index the musicDirFiles array to get the file
 		// corresponding to the song that needs to be added to the xml file.
@@ -191,7 +211,8 @@ public class XMLEditor {
 	
 	private static void addSongToXML() {
 		// Initializes the array list with song objects to add to the xml file.
-		createNewSongObject();
+		// and return the number of imported files (files that has error in importing progress will not be counted)
+		int succImportedFileNum = createNewSongObject();
 		
 		if (songsToAdd.size() == 0) {
 			return;
@@ -252,7 +273,7 @@ public class XMLEditor {
             }
             
             // Calculates the new xml file number, taking into account the new songs.
-            int newXMLFileNum = MusicPlayer.getXMLFileNum() + songFilesToAdd.size();
+            int newXMLFileNum = MusicPlayer.getXMLFileNum() + succImportedFileNum;
 
             // Creates node to update xml file number.
             expr = xpath.compile("/library/musicLibrary/fileNum");
@@ -275,7 +296,6 @@ public class XMLEditor {
             // Updates the lastId in MusicPlayer.
         	MusicPlayer.setLastIdAssigned(newLastIdAssigned);
             
-            
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
@@ -290,7 +310,10 @@ public class XMLEditor {
 		}
 	}
 	
-	private static void createNewSongObject() {
+	private static int createNewSongObject() {
+		
+		// there are some files we can not import, it will not be counted
+		int succImportedFileNum = 0;
 		
 		// Searches the xml file to get the last id assigned.
 		int lastIdAssigned = xmlLastIdAssignedFinder();
@@ -332,15 +355,21 @@ public class XMLEditor {
 
 	            // Adds the new song to the songsToAdd array list.
 	            songsToAdd.add(newSong);
+				
+				succImportedFileNum++;
 			} catch (NullPointerException npe) {
+				System.out.println("Can not import " + songFile.getPath());
 				lastIdAssigned--;
 				continue;
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
 		}
+		
 		// Updates the lastIdAssigned in MusicPlayer to account for the new songs.
 		MusicPlayer.setLastIdAssigned(lastIdAssigned);
+		
+		return succImportedFileNum;
 	}
 	
     private static int xmlLastIdAssignedFinder() {
