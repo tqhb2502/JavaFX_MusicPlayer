@@ -9,15 +9,7 @@ import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 
-import app.musicplayer.MusicPlayer;
-import app.musicplayer.model.Album;
-import app.musicplayer.model.Artist;
-import app.musicplayer.model.Library;
-import app.musicplayer.model.Song;
-import app.musicplayer.util.ClippedTableCell;
-import app.musicplayer.util.ControlPanelTableCell;
-import app.musicplayer.util.PlayingTableCell;
-import app.musicplayer.util.SubView;
+
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
@@ -53,6 +45,15 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import main.MusicPlayer;
+import model.Album;
+import model.Artist;
+import model.Library;
+import model.Song;
+import util.ClippedTableCell;
+import util.ControlPanelTableCell;
+import util.PlayingTableCell;
+import util.SubView;
 
 /**
  * FXML Controller class
@@ -60,6 +61,10 @@ import javafx.util.Duration;
  * @author huytq
  */
 public class ArtistsMainController implements Initializable,SubView    {
+
+    private void setGraphic(Object object) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
         
         private class ArtistCell extends ListCell<Artist>
         {
@@ -85,16 +90,42 @@ public class ArtistsMainController implements Initializable,SubView    {
                         ClipboardContent content = new ClipboardContent();
                         content.putString("Artist");
                         db.setContent(content);
-                        MusicPlayer.setDraggedItem(artist);
                         db.setDragView(this.snapshot(null, null), 125, 25);
                         event.consume();
                 });
                 }
             
         }
-        @Override
+        private class AlbumCell extends ListCell<Album> {
+
+        private ImageView albumArtwork = new ImageView();
+        private Album album;
+
+        AlbumCell() {
+            super();
+            setAlignment(Pos.CENTER);
+            setPrefHeight(140);
+            setPrefWidth(140);
+            albumArtwork.setFitWidth(130);
+            albumArtwork.setFitHeight(130);
+            albumArtwork.setPreserveRatio(true);
+            albumArtwork.setSmooth(true);
+            albumArtwork.setCache(true);
+            
+            this.setOnMouseClicked(event -> albumList.getSelectionModel().select(album));
+            
+            this.setOnDragDetected(event -> {
+            	Dragboard db = this.startDragAndDrop(TransferMode.ANY);
+            	ClipboardContent content = new ClipboardContent();
+                content.putString("Album");
+                db.setContent(content);
+            	db.setDragView(this.snapshot(null, null), 75, 75);
+                event.consume();
+            });
+        }
+        
         protected void updateItem(Album album, boolean empty){
-                super.updateItem(album, empty);
+            super.updateItem(album, empty);
             this.album = album;
 
             if (empty){
@@ -315,7 +346,7 @@ public class ArtistsMainController implements Initializable,SubView    {
 				});
 	
 				row.setOnMouseClicked(event -> {
-					TableViewSelectionModel<Song> sm = songTable.getSelectionModel();
+					TableViewSelectionModel<Song> sm = (TableViewSelectionModel<Song>) songTable.getSelectionModel();
 					if (event.getClickCount() == 2 && !row.isEmpty()) {
 						play();
 					} else if (event.isShiftDown()) {
@@ -360,8 +391,7 @@ public class ArtistsMainController implements Initializable,SubView    {
 						}
 					}
 				});
-				
-	
+                                
 				return row ;
 			});
 			
@@ -371,7 +401,7 @@ public class ArtistsMainController implements Initializable,SubView    {
 				}
 				if (newSelection != null && songTable.getSelectionModel().getSelectedIndices().size() == 1) {
 					newSelection.setSelected(true);
-					selectedSong = newSelection;
+					selectedSong = (Song) newSelection;
 				}
 			});
 			
@@ -673,4 +703,5 @@ public class ArtistsMainController implements Initializable,SubView    {
 			}
 		};
 	}
+}
 	
