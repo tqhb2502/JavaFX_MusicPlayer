@@ -79,6 +79,14 @@ public class XMLEditor {
 
 		// Finds the song titles in the music directory and stores them in the librarySongs array list.
 		musicDirFileFinder(new File(musicDirectory));
+		
+//		for (String xmlSongFileName : xmlSongsFileNames) {
+//			System.out.println(xmlSongFileName);
+//		}
+//		System.out.println("-----------------------------------------");
+//		for (String songFileName : musicDirFileNames) {
+//			System.out.println(songFileName);
+//		}
 							
 		// Initializes a counter variable to index the musicDirFiles array to get the file
 		// corresponding to the song that needs to be added to the xml file.
@@ -151,7 +159,7 @@ public class XMLEditor {
 			    	xmlSongsFilePaths.add(songLocation);
 			    	
 			    	// Retrieves the file name from the file path and adds it to the xmlSongsFileNames array list.
-			    	int i = songLocation.lastIndexOf("\\");
+			    	int i = songLocation.lastIndexOf("/");
 			    	String songFileName = songLocation.substring(i + 1, songLocation.length());
 			    	xmlSongsFileNames.add(songFileName);
 			    }
@@ -291,12 +299,14 @@ public class XMLEditor {
 		// Each song object is added to an array list and returned so that they can be added to the xml file.
 		for (File songFile : songFilesToAdd) {
 	        try {
+				// assign id to the song
+				int id = ++lastIdAssigned;
+				
 	            AudioFile audioFile = AudioFileIO.read(songFile);
 	            Tag tag = audioFile.getTag();
 	            AudioHeader header = audioFile.getAudioHeader();
 	            
 	            // Gets song properties.
-	            int id = ++lastIdAssigned;
 	            String title = tag.getFirst(FieldKey.TITLE);
 	            // Gets the artist, empty string assigned if song has no artist.
 	            String artistTitle = tag.getFirst(FieldKey.ALBUM_ARTIST);
@@ -322,6 +332,9 @@ public class XMLEditor {
 
 	            // Adds the new song to the songsToAdd array list.
 	            songsToAdd.add(newSong);
+			} catch (NullPointerException npe) {
+				lastIdAssigned--;
+				continue;
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

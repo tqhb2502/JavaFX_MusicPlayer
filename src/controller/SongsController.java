@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package controller;
 
 import java.net.URL;
@@ -30,11 +26,6 @@ import util.PlayingTableCell;
 import util.ControlPanelTableCell;
 import util.ClippedTableCell;
 
-/**
- * FXML Controller class
- *
- * @author huytq
- */
 public class SongsController implements Initializable, SubView {
 
 	@FXML private TableView<Song> tableView;
@@ -45,11 +36,6 @@ public class SongsController implements Initializable, SubView {
     @FXML private TableColumn<Song, String> lengthColumn;
     @FXML private TableColumn<Song, Integer> playsColumn;
     
-    
-	
-    
-	
-	
 	private String currentSortColumn = "titleColumn";
     private String currentSortOrder = null;
     
@@ -85,7 +71,8 @@ public class SongsController implements Initializable, SubView {
 			event.consume();
 		});
 		
-		ObservableList<Song> songs = Library.getPlaylist("Default").getSongs();
+//		ObservableList<Song> songs = Library.getPlaylist("Default").getSongs();
+		ObservableList<Song> songs = Library.getSongs();
 		
 		Collections.sort(songs, (x, y) -> compareSongs(x, y));
 		

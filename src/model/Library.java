@@ -25,6 +25,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -169,16 +170,11 @@ public class Library {
 				
 				try {
 					
-					// create audio file's tagger
-					AudioFile audioFile = AudioFileIO.read(file);
-					Tag tag = audioFile.getTag();
-					AudioHeader header = audioFile.getAudioHeader();
-					
 					// create song element
 					Element song = doc.createElement("song");
 					songs.appendChild(song);
 					
-					// song element's childs (song's info)
+					// song element's childs (stores song's info)
 					Element id = doc.createElement("id");
                     Element title = doc.createElement("title");
                     Element artist = doc.createElement("artist");
@@ -190,9 +186,19 @@ public class Library {
                     Element playDate = doc.createElement("playDate");
                     Element location = doc.createElement("location");
 					
-					// fill song's info into elements
+					// assign id to this song
 					id.setTextContent(Integer.toString(i++));
-					title.setTextContent(tag.getFirst(FieldKey.TITLE));
+					
+					// create audio file's tagger
+					AudioFile audioFile = AudioFileIO.read(file);
+					Tag tag = audioFile.getTag();
+					AudioHeader header = audioFile.getAudioHeader();
+									
+					// fill song's info into elements
+					String songTitle = tag.getFirst(FieldKey.TITLE);
+					title.setTextContent(
+						(songTitle == null || songTitle.equals("") || songTitle.equals("null")) ? "" : songTitle
+					);
 					String artistTitle = tag.getFirst(FieldKey.ALBUM_ARTIST);
                     if (artistTitle == null || artistTitle.equals("") || artistTitle.equals("null")) {
                         artistTitle = tag.getFirst(FieldKey.ARTIST);
@@ -229,6 +235,11 @@ public class Library {
 					// update importing progress
 					task.updateProgress(i, maxProgress);
 					
+				} catch (NullPointerException npe) {
+					songs.removeChild(songs.getLastChild());
+					i--;
+					System.out.println("Cannot import " + file.getAbsolutePath());
+					continue;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -408,7 +419,9 @@ public class Library {
 					// end tag of song
 					
 					// add song
-					songs.add(new Song(id, title, artist, album, length, trackNumber, discNumber, playCount, playDate, location));
+					if (location != null) {
+						songs.add(new Song(id, title, artist, album, length, trackNumber, discNumber, playCount, playDate, location));	
+					}
 					
 					// reset
 					id = -1;

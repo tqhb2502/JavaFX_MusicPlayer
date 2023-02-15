@@ -328,7 +328,9 @@ public class PlaylistsController implements Initializable, SubView {
             XMLEditor.deletePlaylistFromXML(selectedPlaylist.getId());
 
             // Loads the artists view.
-            MusicPlayer.getMainController().loadView("artists");
+			HBox songsHBox = MusicPlayer.getMainController().getSongsHBox();
+			MusicPlayer.getMainController().setStyleAndLoad("Songs", songsHBox.getStyleClass());
+//            MusicPlayer.getMainController().loadView("Songs");
 
             // Removes the selected playlist from the library so that it is not reloaded.
             Library.removePlaylist(selectedPlaylist);
