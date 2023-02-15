@@ -125,19 +125,22 @@ public class MusicPlayer extends Application {
 		}
 		
 		System.out.println("nowPlayingList size: " + nowPlayingList.size());
-		nowPlaying = nowPlayingList.get(0);
-		nowPlayingIndex = 0;
-		nowPlaying.setPlaying(true);
 		
-		timer = new Timer();
-		timerCounter = 0;
-		secondsPlayed = 0;
+		if (nowPlayingList.size() > 0) {
+			nowPlaying = nowPlayingList.get(0);
+			nowPlayingIndex = 0;
+			nowPlaying.setPlaying(true);
 
-		String path = nowPlaying.getLocation();
-		Media media = new Media(Paths.get(path).toUri().toString());
-		mediaPlayer = new MediaPlayer(media);
-		mediaPlayer.setVolume(0.5);
-		mediaPlayer.setOnEndOfMedia(new SongSkipper());
+			timer = new Timer();
+			timerCounter = 0;
+			secondsPlayed = 0;
+
+			String path = nowPlaying.getLocation();
+			Media media = new Media(Paths.get(path).toUri().toString());
+			mediaPlayer = new MediaPlayer(media);
+			mediaPlayer.setVolume(0.5);
+			mediaPlayer.setOnEndOfMedia(new SongSkipper());
+		}
 
 		// download image
 
