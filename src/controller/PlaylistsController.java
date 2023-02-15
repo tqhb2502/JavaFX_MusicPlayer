@@ -288,6 +288,7 @@ public class PlaylistsController implements Initializable, SubView {
 		ObservableList<Song> allSongs, selected_song;
         allSongs = tableView.getItems();
         selected_song = tableView.getSelectionModel().getSelectedItems();
+		System.out.print(selected_song);
 
         // Removes the selected item from the table view.
         selected_song.forEach(allSongs::remove);

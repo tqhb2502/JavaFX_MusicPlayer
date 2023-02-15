@@ -586,8 +586,12 @@ public class Library {
 	public static void addPlaylist(String text) {
 
         Thread thread = new Thread(() -> {
-
-            int i = playlists.size() - 2;
+			int i;
+			int size = playlists.size();
+			if(size == 0) i = 0;
+			else i = playlists.get(0).getId() + 1;
+			System.out.println(size + " " + i);
+//            int i = playlists.size();
             playlists.add(new Playlist(i, text, new ArrayList<>()));
 
             try {
@@ -724,7 +728,12 @@ public class Library {
         int playListSize = Library.getPlaylists().size();
         // The +2 takes into account the two default play lists.
         // The -1 is used because size() starts at 1 but indexes start at 0.
-        return playlists.get(playListSize - (id + 2) - 1);
+		System.out.println(playListSize + " " + id);
+		for(Playlist playlist: playlists) {
+			if(playlist.getId() == id) return playlist;
+		} 
+		return null;
+//        return playlists.get(playListSize - id - 1);
     }
 	
 	public static Playlist getPlaylist(String title) {

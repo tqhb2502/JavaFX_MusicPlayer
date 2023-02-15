@@ -16,6 +16,7 @@ import javafx.scene.control.OverrunStyle;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import main.MusicPlayer;
 import model.Artist;
 import model.Library;
 import model.Song;
@@ -91,6 +92,13 @@ public class ArtistsController implements Initializable, SubView {
 		// cell's event listener
 		cell.setOnMouseClicked(event -> {
 			System.out.println("artist cell clicked");
+			MainController mainController = MusicPlayer.getMainController();
+            ArtistsMainController artistsMainController = (ArtistsMainController) mainController.loadView("ArtistsMain");
+
+            VBox artistCell = (VBox) event.getSource();
+            String artistTitle = ((Label) artistCell.getChildren().get(1)).getText();
+            Artist a = Library.getArtist(artistTitle);
+            artistsMainController.selectArtist(a);
 		});
 		
 		return cell;
