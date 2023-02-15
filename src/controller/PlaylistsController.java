@@ -290,7 +290,11 @@ public class PlaylistsController implements Initializable, SubView {
         selected_song = tableView.getSelectionModel().getSelectedItems();
 
         // Removes the selected item from the table view.
-        selected_song.forEach(allSongs::remove);
+		try {
+			selected_song.forEach(allSongs::remove);
+		} catch (Exception e) {
+		}
+		tableView.getSelectionModel().clearSelection();
 	}
 	
 	@FXML
