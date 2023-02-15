@@ -10,6 +10,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import main.MusicPlayer;
 import model.Library;
 import util.ImportMusicTask;
 
@@ -62,7 +63,9 @@ public class ImportMusicDialogController implements Initializable {
 					
 					try {
 						musicImported = false;
+						// delete old data
 						Library.deleteLibraryXML();
+						// get new data from new dir
 						Library.importMusic(musicDirectory, this);
 						return true;
 					} catch (Exception e) {

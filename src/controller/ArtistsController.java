@@ -105,5 +105,4 @@ public class ArtistsController implements Initializable, SubView {
 	public Song getSelectedSong() {
 		return null;
 	}
-	
 }

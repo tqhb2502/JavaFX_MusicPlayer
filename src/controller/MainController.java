@@ -253,7 +253,7 @@ public class MainController implements Initializable {
 		loadView("Songs");
 	}
 	
-	private void resetViewLoadedLatch() {
+	public void resetViewLoadedLatch() {
 		viewLoadedLatch = new CountDownLatch(1);
 	}
 	
@@ -424,20 +424,34 @@ public class MainController implements Initializable {
 	
 	@FXML
 	private void reimportMusic() {
+		// pause and reset media player
+		MusicPlayer.resetMediaPlayer();
+		// show import music dialog
 		MusicPlayer.createLibraryXML();
+		// get new file num according to library.xml
 		MusicPlayer.setXMLFileNum(MusicPlayer.xmlMusicDirFileNumFinder());
-		MusicPlayer.getNowPlayingList().clear();
+		// reset library data
+		Library.resetSongs();
+		Library.resetAlbums();
+		Library.resetArtists();
+		Library.resetPlaylists();
+		// get new data
 		Thread thread = new Thread(MusicPlayer::prepareAndShowMain);
 		thread.start();
 	}
 	
 	@FXML
 	private void refreshMusicPlayer() {
+		// pause and reset media player
+		MusicPlayer.resetMediaPlayer();
+		// check if there is any change in music dir
 		MusicPlayer.checkLibraryXML();
+		// reset library data
 		Library.resetSongs();
 		Library.resetAlbums();
 		Library.resetArtists();
 		Library.resetPlaylists();
+		// get new data
 		Thread thread = new Thread(MusicPlayer::prepareAndShowMain);
 		thread.start();
 	}
@@ -721,10 +735,6 @@ public class MainController implements Initializable {
     		volumePopup.show();
     		volumeShowAnimation.play();
 		}
-	}
-
-	@FXML
-	private void letterClicked(Event e) {
 	}
 	
 	/**
