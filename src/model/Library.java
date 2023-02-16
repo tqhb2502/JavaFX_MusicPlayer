@@ -626,11 +626,6 @@ public class Library {
 
         thread.start();
 		
-		if(text.equals("Default")) try {
-			thread.join();
-		} catch (InterruptedException ex) {
-			Logger.getLogger(Library.class.getName()).log(Level.SEVERE, null, ex);
-		}
     }
 	
     public static void removePlaylist(Playlist playlist) {
@@ -700,8 +695,6 @@ public class Library {
                 }
             });
 
-//            playlists.add(new MostPlayedPlaylist(-2));
-//            playlists.add(new RecentlyPlayedPlaylist(-1));
         } else {
             playlists.sort((x, y) -> {
                 if (x.getId() < y.getId()) {
@@ -726,14 +719,12 @@ public class Library {
         }
         // Gets the play list size.
         int playListSize = Library.getPlaylists().size();
-        // The +2 takes into account the two default play lists.
-        // The -1 is used because size() starts at 1 but indexes start at 0.
+		
 		System.out.println(playListSize + " " + id);
 		for(Playlist playlist: playlists) {
 			if(playlist.getId() == id) return playlist;
 		} 
 		return null;
-//        return playlists.get(playListSize - id - 1);
     }
 	
 	public static Playlist getPlaylist(String title) {
