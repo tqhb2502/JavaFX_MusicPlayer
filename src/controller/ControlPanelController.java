@@ -83,7 +83,6 @@ public class ControlPanelController implements Initializable {
 		ObservableList<String> playlistTitles = FXCollections.observableArrayList();
 		for (Playlist playlist : playlists) {
 			String title = playlist.getTitle();
-			if(title.equals("Default")) continue;
 			playlistTitles.add(title);
 			
 		}
