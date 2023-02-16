@@ -227,11 +227,13 @@ public class ArtistsMainController implements Initializable, SubView {
     	        		Platform.runLater(() -> {
     	        			subViewRoot.setVisible(false);
     	        			selectedArtist = artistList.getSelectionModel().getSelectedItem();
-                            showAllSongs(selectedArtist, false);
-                            artistLabel.setText(selectedArtist.getTitle());
-                            albumList.setPrefWidth(albumList.getItems().size() * 150 + 2);
-                            albumList.setMaxWidth(albumList.getItems().size() * 150 + 2);
-                            albumList.scrollTo(0);
+							if (selectedArtist != null) {
+								showAllSongs(selectedArtist, false);
+								artistLabel.setText(selectedArtist.getTitle());
+								albumList.setPrefWidth(albumList.getItems().size() * 150 + 2);
+								albumList.setMaxWidth(albumList.getItems().size() * 150 + 2);
+								albumList.scrollTo(0);
+							}
     	        		});
     		        	return null;
     	        	}
@@ -506,12 +508,10 @@ public class ArtistsMainController implements Initializable, SubView {
         ObservableList<Album> albums = FXCollections.observableArrayList();
         ObservableList<Song> songs = FXCollections.observableArrayList();
 
-        for (Album album : artist.getAlbums()) {
-
-            albums.add(album);
-
-            songs.addAll(album.getSongs());
-        }
+		for (Album album : artist.getAlbums()) {
+			albums.add(album);
+			songs.addAll(album.getSongs());
+		}
 
         Collections.sort(songs, (first, second) -> {
 
