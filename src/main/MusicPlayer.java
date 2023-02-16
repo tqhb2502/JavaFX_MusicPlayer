@@ -197,9 +197,7 @@ public class MusicPlayer extends Application {
 				xmlFileNum = xmlMusicDirFileNumFinder();
 				
 				// update XML file according to music directory
-				if (musicDirFileNum != xmlFileNum) {
-					updateLibraryXML(musicDirectory);
-				}
+				updateLibraryXML(musicDirectory);
 				
 			} catch (NullPointerException npe) {
 				// catch if music directory's name has changed
