@@ -102,7 +102,7 @@ public class SongsController implements Initializable, SubView {
 				if (event.getClickCount() == 2 && !row.isEmpty()) {    
 //					selectedSong = tableView.getSelectionModel().getSelectedItems();
 					selectedSong = sm.getSelectedItem();
-					System.out.println(selectedSong.getTitle());
+//					System.out.println(selectedSong.getTitle());
 					play();
 				} else if (event.isShiftDown()) {
 					ArrayList<Integer> indices = new ArrayList<>(sm.getSelectedIndices());
@@ -217,7 +217,7 @@ public class SongsController implements Initializable, SubView {
 	public void play() {
 		Song song = selectedSong;
 //		System.out.println("In song, play: " + selectedSong.getTitle());
-		ObservableList<Song> songList = tableView.getItems();
+		ObservableList<Song> songList = Library.getSongs();
 		if(MusicPlayer.isShuffleActive()) {
 			Collections.shuffle(songList);
 			songList.remove(song);

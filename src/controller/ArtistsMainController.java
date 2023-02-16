@@ -192,7 +192,10 @@ public class ArtistsMainController implements Initializable, SubView {
         artistList.setOnMouseClicked(event -> {
 
             if (event.getClickCount() == 2) {
-
+				
+				// set selected to new artist
+				selectedArtist = artistList.getSelectionModel().getSelectedItem();
+				
                 ObservableList<Song> songs = FXCollections.observableArrayList();
                 ObservableList<Album> albums = FXCollections.observableArrayList();
                 for (Album album : selectedArtist.getAlbums()) {
