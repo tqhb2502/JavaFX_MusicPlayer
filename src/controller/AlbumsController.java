@@ -45,7 +45,6 @@ import model.Library;
 import model.Song;
 import util.ClippedTableCell;
 import util.ControlPanelTableCell;
-import util.PlayingTableCell;
 import util.SubView;
 
 public class AlbumsController implements Initializable, SubView {
@@ -373,13 +372,11 @@ public class AlbumsController implements Initializable, SubView {
     	// Retrieves albums songs and stores them as an observable list.
     	ObservableList<Song> albumSongs = FXCollections.observableArrayList(selectedAlbum.getSongs());
     	
-        playingColumn.setCellFactory(x -> new PlayingTableCell<Song, Boolean>());
         titleColumn.setCellFactory(x -> new ControlPanelTableCell<Song, String>());
         lengthColumn.setCellFactory(x -> new ClippedTableCell<Song, String>());
         playsColumn.setCellFactory(x -> new ClippedTableCell<Song, Integer>());
 
         // Sets each column item.
-        playingColumn.setCellValueFactory(new PropertyValueFactory<Song, Boolean>("playing"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("title"));
         lengthColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("length"));
         playsColumn.setCellValueFactory(new PropertyValueFactory<Song, Integer>("playCount"));

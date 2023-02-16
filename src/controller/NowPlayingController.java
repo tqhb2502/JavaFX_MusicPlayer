@@ -26,7 +26,6 @@ import main.MusicPlayer;
 import model.Song;
 import util.ClippedTableCell;
 import util.ControlPanelTableCell;
-import util.PlayingTableCell;
 import util.SubView;
 
 /**
@@ -69,14 +68,12 @@ public class NowPlayingController implements Initializable, SubView {
         lengthColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(50).multiply(0.11));
         playsColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(50).multiply(0.11));
 
-        playingColumn.setCellFactory(x -> new PlayingTableCell<>());
         titleColumn.setCellFactory(x -> new ControlPanelTableCell<>());
         artistColumn.setCellFactory(x -> new ClippedTableCell<>());
         albumColumn.setCellFactory(x -> new ClippedTableCell<>());
         lengthColumn.setCellFactory(x -> new ClippedTableCell<>());
         playsColumn.setCellFactory(x -> new ClippedTableCell<>());
 
-        playingColumn.setCellValueFactory(new PropertyValueFactory<>("playing"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         artistColumn.setCellValueFactory(new PropertyValueFactory<>("artist"));
         albumColumn.setCellValueFactory(new PropertyValueFactory<>("album"));

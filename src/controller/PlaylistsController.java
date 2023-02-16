@@ -40,7 +40,6 @@ import model.Playlist;
 import model.Song;
 import util.ClippedTableCell;
 import util.ControlPanelTableCell;
-import util.PlayingTableCell;
 import util.Resources;
 import util.SubView;
 import util.XMLEditor;
@@ -113,14 +112,12 @@ public class PlaylistsController implements Initializable, SubView {
         lengthColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(50).multiply(0.11));
         playsColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(50).multiply(0.11));
 
-        playingColumn.setCellFactory(x -> new PlayingTableCell<>());
         titleColumn.setCellFactory(x -> new ControlPanelTableCell<>());
         artistColumn.setCellFactory(x -> new ClippedTableCell<>());
         albumColumn.setCellFactory(x -> new ClippedTableCell<>());
         lengthColumn.setCellFactory(x -> new ClippedTableCell<>());
         playsColumn.setCellFactory(x -> new ClippedTableCell<>());
 
-        playingColumn.setCellValueFactory(new PropertyValueFactory<>("playing"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         artistColumn.setCellValueFactory(new PropertyValueFactory<>("artist"));
         albumColumn.setCellValueFactory(new PropertyValueFactory<>("album"));
@@ -267,12 +264,6 @@ public class PlaylistsController implements Initializable, SubView {
         image.setFitWidth(150);
         image.setImage(new Image(Resources.IMG + "playlistsIcon.png"));
 
-//        VBox placeholder = new VBox();
-//        placeholder.setAlignment(Pos.CENTER);
-//        placeholder.getChildren().addAll(image, message);
-//        VBox.setMargin(image, new Insets(0, 0, 50, 0));
-
-//        tableView.setPlaceholder(placeholder);
     }
 	
 	@Override

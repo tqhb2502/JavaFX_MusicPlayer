@@ -44,7 +44,6 @@ import model.Library;
 import model.Song;
 import util.ClippedTableCell;
 import util.ControlPanelTableCell;
-import util.PlayingTableCell;
 import util.SubView;
 
 public class ArtistsMainController implements Initializable, SubView {
@@ -162,12 +161,10 @@ public class ArtistsMainController implements Initializable, SubView {
         lengthColumn.prefWidthProperty().bind(songTable.widthProperty().subtract(50).multiply(0.25));
         playsColumn.prefWidthProperty().bind(songTable.widthProperty().subtract(50).multiply(0.25));
 
-        playingColumn.setCellFactory(x -> new PlayingTableCell<>());
         titleColumn.setCellFactory(x -> new ControlPanelTableCell<>());
         lengthColumn.setCellFactory(x -> new ClippedTableCell<>());
         playsColumn.setCellFactory(x -> new ClippedTableCell<>());
 
-        playingColumn.setCellValueFactory(new PropertyValueFactory<>("playing"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("length"));
         playsColumn.setCellValueFactory(new PropertyValueFactory<>("playCount"));
