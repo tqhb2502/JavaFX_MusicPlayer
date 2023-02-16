@@ -245,7 +245,7 @@ public class AlbumsController implements Initializable, SubView {
     private VBox createCell(Album album, int index) {
 
         VBox cell = new VBox();
-        Label title = new Label(album.getTitle());
+        Label title = new Label(album.getArtist() + " | " + album.getTitle());
         VBox imageBox = new VBox();
 
         title.setTextOverrun(OverrunStyle.CLIP);
@@ -405,7 +405,8 @@ public class AlbumsController implements Initializable, SubView {
     public void play() {
     	
     	Song song = selectedSong;
-        ObservableList<Song> songList = songTable.getItems();
+//        ObservableList<Song> songList = songTable.getItems();
+		ArrayList<Song> songList = Library.getAlbum(selectedSong.getAlbum()).getSongs();
         if (MusicPlayer.isShuffleActive()) {
         	Collections.shuffle(songList);
         	songList.remove(song);

@@ -63,10 +63,22 @@ public class ImportMusicDialogController implements Initializable {
 					
 					try {
 						musicImported = false;
+						// pause and reset media player
+						MusicPlayer.resetMediaPlayer();
+						// reset library data
+						Library.resetSongs();
+						Library.resetAlbums();
+						Library.resetArtists();
+						Library.resetPlaylists();
 						// delete old data
 						Library.deleteLibraryXML();
 						// get new data from new dir
 						Library.importMusic(musicDirectory, this);
+						// get new file num according to library.xml
+						MusicPlayer.setXMLFileNum(MusicPlayer.xmlMusicDirFileNumFinder());
+						// get new data
+						Thread thread = new Thread(MusicPlayer::prepareAndShowMain);
+						thread.start();
 						return true;
 					} catch (Exception e) {
 						e.printStackTrace();

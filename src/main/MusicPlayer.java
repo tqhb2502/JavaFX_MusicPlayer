@@ -114,10 +114,15 @@ public class MusicPlayer extends Application {
 		// pause current playing song
 		pause();
 		// reset media player
+		if (nowPlaying != null) {
+			nowPlaying.setPlaying(false);
+		}
 		nowPlaying = null;
 		mediaPlayer = null;
 		// clear now playing list
-		nowPlayingList.clear();
+		if (nowPlayingList != null) {
+			nowPlayingList.clear();
+		}
 	}
 	
 	public static void prepareAndShowMain() {
@@ -393,7 +398,9 @@ public class MusicPlayer extends Application {
 			mainController = loader.getController();
 			
 			// bind music player volume to volume slider
-			// todo
+			if (mediaPlayer != null) {
+				mediaPlayer.volumeProperty().bind(mainController.getVolumeSlider().valueProperty().divide(100));	
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -486,7 +493,7 @@ public class MusicPlayer extends Application {
 			String path = song.getLocation();
 			Media media = new Media(Paths.get(path).toUri().toString());
 			mediaPlayer = new MediaPlayer(media);
-			// bind volume
+			mediaPlayer.volumeProperty().bind(mainController.getVolumeSlider().valueProperty().divide(100));
 			mediaPlayer.setOnEndOfMedia(new SongSkipper());
 			mediaPlayer.setMute(isMuted);
 			
@@ -661,9 +668,9 @@ public class MusicPlayer extends Application {
 	 * @param isMuted true: mutes, false: unmutes
 	 */
 	public static void mute(boolean isMuted) {
-        MusicPlayer.isMuted = isMuted;
+        MusicPlayer.isMuted = !isMuted;
         if (mediaPlayer != null) {
-            mediaPlayer.setMute(isMuted);
+            mediaPlayer.setMute(!isMuted);
         }
     }
 	

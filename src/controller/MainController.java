@@ -415,31 +415,24 @@ public class MainController implements Initializable {
 	 */
 	public void updatePlayPauseIcon(boolean isPlaying) {
 		
-		controlBox.getChildren().remove(1);
+		try {
+			
+			controlBox.getChildren().remove(1);
 		
-		if (isPlaying) {
-			controlBox.getChildren().add(1, pauseButton);
-		} else {
-			controlBox.getChildren().add(1, playButton);
+			if (isPlaying) {
+				controlBox.getChildren().add(1, pauseButton);
+			} else {
+				controlBox.getChildren().add(1, playButton);
+			}
+		} catch (Exception e) {
+			
 		}
 	}
 	
 	@FXML
 	private void reimportMusic() {
-		// pause and reset media player
-		MusicPlayer.resetMediaPlayer();
 		// show import music dialog
 		MusicPlayer.createLibraryXML();
-		// get new file num according to library.xml
-		MusicPlayer.setXMLFileNum(MusicPlayer.xmlMusicDirFileNumFinder());
-		// reset library data
-		Library.resetSongs();
-		Library.resetAlbums();
-		Library.resetArtists();
-		Library.resetPlaylists();
-		// get new data
-		Thread thread = new Thread(MusicPlayer::prepareAndShowMain);
-		thread.start();
 	}
 	
 	@FXML
@@ -729,7 +722,7 @@ public class MainController implements Initializable {
 	}
 
 	@FXML
-	private void volumeClick(Event e) {
+	public void volumeClick() {
 		if (!volumePopup.isShowing()) {
 			Stage stage = MusicPlayer.getStage();
     		volumePopup.setX(stage.getX() + stage.getWidth() - 265);
@@ -737,6 +730,10 @@ public class MainController implements Initializable {
     		volumePopup.show();
     		volumeShowAnimation.play();
 		}
+	}
+	
+	public Slider getVolumeSlider() {
+		return volumePopupController.getSlider();
 	}
 	
 	/**
@@ -916,6 +913,26 @@ public class MainController implements Initializable {
         }
 	}
 	
+	public VBox getPlaylistBox() {
+		return playlistBox;
+	}
+
+	public HBox getArtistsHBox() {
+		return artistsHBox;
+	}
+
+	public HBox getAlbumsHBox() {
+		return albumsHBox;
+	}
+
+	public HBox getSongsHBox() {
+		return songsHBox;
+	}
+
+	public HBox getPlayingHBox() {
+		return playingHBox;
+	}
+	
 	/**
 	 * Animation
 	 */
@@ -1022,24 +1039,4 @@ public class MainController implements Initializable {
     		}
         }
     };
-
-	public VBox getPlaylistBox() {
-		return playlistBox;
-	}
-
-	public HBox getArtistsHBox() {
-		return artistsHBox;
-	}
-
-	public HBox getAlbumsHBox() {
-		return albumsHBox;
-	}
-
-	public HBox getSongsHBox() {
-		return songsHBox;
-	}
-
-	public HBox getPlayingHBox() {
-		return playingHBox;
-	}
 }
