@@ -1,3 +1,3 @@
 The final project of IT4944 - Hệ điều hành và quản trị mạng Linux theo chuẩn kỹ năng ITSS
 Based on https://github.com/Mpmart08/MusicPlayer
-External library: JavaFX 19, jaudiotagger
+External library: JavaFX 19, jaudiotagger 3.0.1
